@@ -1,0 +1,13 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+ul::-webkit-scrollbar {
+  width: 4px;
+  background: transparent;
+}
+
+ul::-webkit-scrollbar-thumb {
+  width: 4px;
+  background-color: #dedede;
+}
