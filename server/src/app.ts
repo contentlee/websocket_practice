@@ -1,44 +1,49 @@
 import http from "http";
 import express from "express";
-import WebSocket from "ws";
-
 import { Server } from "socket.io";
 
 const app = express();
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const httpServer = http.createServer(app);
 
-const sockets: WebSocket[] = [];
-
-wss.on("connection", (socket: any) => {
-  sockets.push(socket);
-  socket["nickname"] = "익명";
-  socket.on("message", (data: WebSocket.RawData) => {
-    const message = JSON.parse(data.toString());
-    switch (message.type) {
-      case "message":
-        sockets.forEach((aSocket) => aSocket.send(`${socket.nickname} : ${message.payload}`));
-        break;
-      case "nickname":
-        socket["nickname"] = message.payload;
-        break;
-    }
-  });
-
-  socket.on("close", () => console.log("Disconnected to Browser"));
+const wsServer = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
 });
 
-const handleListen = () => console.log("listein on ws");
-server.listen(8080, handleListen);
+const getRooms = () => {
+  const {
+    sockets: {
+      adapter: { sids, rooms },
+    },
+  } = wsServer;
+  const publicRoom: string[] = [];
+  rooms.forEach((_, key) => {
+    if (sids.get(key) === undefined) publicRoom.push(key);
+  });
 
-const io = new Server(3000);
+  return publicRoom;
+};
 
-io.on("connection", (socket) => {
-  // send a message to the client
-  socket.emit("hello from server", 1, "2", { 3: Buffer.from([4]) });
+wsServer.on("connection", (socket) => {
+  socket.on("create_room", (name, done) => {
+    socket.join(name);
+    wsServer.sockets.emit("change_rooms", getRooms());
+    done();
+  });
 
-  // receive a message from the client
-  socket.on("hello from client", (...args) => {
-    // ...
+  socket.on("enter_room", (name, room, done) => {
+    socket.join(name);
+    socket.to(room).emit("welcome", name);
+    done();
+  });
+
+  socket.on("new_message", (message, room, name, done) => {
+    socket.to(room).emit("new_message", name, message);
+    done();
   });
 });
+
+const handleListen = () => console.log("listen on ws");
+httpServer.listen(8080, handleListen);
