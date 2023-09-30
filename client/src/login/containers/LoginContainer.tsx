@@ -1,23 +1,30 @@
+import { useNavigate } from "react-router";
+import { useOutletContext } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { produce } from "immer";
+// import { Socket } from "socket.io-client";
 
 import { Input, Button } from "@components";
 
 import { userAtom } from "@atoms/userAtom";
 
 const LoginContainer = () => {
+  const navigate = useNavigate();
+
+  // const { socket } = useOutletContext<{ socket: Socket }>();
   const [_, setUser] = useRecoilState(userAtom);
 
   const handleNameSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const input = e.currentTarget[0] as HTMLInputElement;
+
     setUser((prev) =>
       produce(prev, (draft) => {
         draft.name = input.value;
         return draft;
       })
     );
-    input.value = "";
+    navigate("/");
   };
 
   return (

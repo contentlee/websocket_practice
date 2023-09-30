@@ -12,15 +12,21 @@ const wsServer = new Server(httpServer, {
   },
 });
 
+const countMember = (roomName: string) => {
+  return wsServer.sockets.adapter.rooms.get(roomName)!.size;
+};
+
 const getRooms = () => {
   const {
     sockets: {
       adapter: { sids, rooms },
     },
   } = wsServer;
-  const publicRoom: string[] = [];
+  const publicRoom: { name: string; length: number }[] = [];
   rooms.forEach((_, key) => {
-    if (sids.get(key) === undefined) publicRoom.push(key);
+    if (sids.get(key) === undefined) {
+      publicRoom.push({ name: key, length: countMember(key) });
+    }
   });
 
   return publicRoom;

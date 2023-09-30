@@ -22,7 +22,7 @@ const TextArea = ({ label, ...props }: Props) => {
         width: "100%",
         maxWidth: "350px",
         boxSizing: "border-box",
-        border: `1px solid ${palette.main.blk}`,
+        border: `1.5px solid ${palette.main.blk}`,
         backgroundColor: palette.background,
         color: palette.main.blk,
       }}
@@ -37,6 +37,7 @@ const TextArea = ({ label, ...props }: Props) => {
           border: "none",
           boxSizing: "border-box",
           fontSize: "14px",
+          fontFamily: "pretendard",
           resize: "none",
           background: palette.background,
         }}
@@ -45,6 +46,8 @@ const TextArea = ({ label, ...props }: Props) => {
       ></textarea>
       <label
         css={{
+          position: "absolute",
+
           left: "10px",
           top: "-7px",
           padding: "0 4px",

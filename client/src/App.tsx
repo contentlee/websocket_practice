@@ -5,6 +5,8 @@ import { Routes } from "react-router";
 import { Route } from "react-router-dom";
 import { LoginPage } from "@login";
 import { CommonPage } from "@pages";
+import EntryPage from "./entry/pages/EntryPage";
+import ChatPage from "./chat/pages/ChatPage";
 
 // interface Message {
 //   type: "welcome" | "message" | "myMessage";
@@ -82,8 +84,11 @@ function App() {
 
   return (
     <Routes>
-      <Route element={<CommonPage></CommonPage>}></Route>
-      <Route path="/" element={<LoginPage></LoginPage>}></Route>
+      <Route element={<CommonPage></CommonPage>}>
+        <Route path="/login" element={<LoginPage />}></Route>
+        <Route path="/" element={<EntryPage />}></Route>
+        <Route path="/chat/:name" element={<ChatPage />}></Route>
+      </Route>
     </Routes>
     // <div
     //   css={{

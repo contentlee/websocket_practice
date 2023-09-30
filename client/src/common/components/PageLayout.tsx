@@ -8,13 +8,13 @@ const PageLayout = ({ children, ...props }: Props) => {
   return (
     <div
       css={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        width: "100%",
+        minWidth: "310px",
         maxWidth: "390px",
         height: "100%",
         padding: "20px",
         boxSizing: "border-box",
+        overflow: "auto",
       }}
       {...props}
     >

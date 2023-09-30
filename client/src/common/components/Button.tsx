@@ -18,6 +18,7 @@ const Button = ({ color = "primary", children, ...props }: Props) => {
         boxSizing: "border-box",
         transition: ".2s",
         cursor: "pointer",
+        whiteSpace: "nowrap",
         ...COLOR_VARIANTS[color],
       }}
       {...props}
@@ -37,13 +38,14 @@ const COLOR_VARIANTS = {
     },
   },
   secondary: {
-    border: "1px solid transparent",
+    border: "1.5px solid transparent",
     color: palette.main.blk,
-    backgroundColor: palette.main.wht,
+    backgroundColor: "transparent",
     borderColor: palette.main.blk,
     "&:hover": {
       color: palette.main.wht,
       backgroundColor: palette.point.red,
+      borderColor: palette.point.red,
     },
   },
 };
