@@ -14,7 +14,6 @@ const SendForm = ({ ...props }: Props) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const target = e.currentTarget[0] as HTMLTextAreaElement;
-    console.log(target.value);
     if (!target.value) return;
     socket.emit("new_message", target.value, name, () => {
       target.value = "";

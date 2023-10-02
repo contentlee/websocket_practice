@@ -28,7 +28,6 @@ const RoomListContainer = () => {
 
   const handleClickRoom = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
-    console.log(name);
     socket.emit("enter_room", name, () => {
       navigate(`/chat/${name}`);
     });
@@ -77,7 +76,6 @@ const RoomListContainer = () => {
       }}
     >
       {rooms.map(({ name, length, possible }) => {
-        console.log(possible);
         return (
           <RoomItem
             key={name}

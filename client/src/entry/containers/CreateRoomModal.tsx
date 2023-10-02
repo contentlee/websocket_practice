@@ -29,11 +29,10 @@ const CreateRoomModal = () => {
 
     if (!roomName) return;
 
-    setModal(closeModalAction);
-
     socket?.emit("create_room", roomName, maxLength ? maxLength : 100, notification, () => {
       navigate(`/chat/${roomName}`);
     });
+    setModal(closeModalAction);
   };
 
   const handleClickCancel = (e: React.MouseEvent) => {
