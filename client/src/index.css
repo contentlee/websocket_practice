@@ -29,6 +29,15 @@ button {
   border-radius: 0;
 }
 
+select {
+  outline: none;
+  border: none;
+  -o-appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 ul::-webkit-scrollbar {
   width: 4px;
   background: transparent;

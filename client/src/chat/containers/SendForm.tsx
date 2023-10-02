@@ -23,12 +23,12 @@ const SendForm = ({ ...props }: Props) => {
   return (
     <div
       css={{
-        width: "100%",
         display: "flex",
         justifyContent: "center",
         position: "fixed",
         bottom: 0,
         left: 0,
+        width: "100%",
         boxSizing: "border-box",
       }}
     >

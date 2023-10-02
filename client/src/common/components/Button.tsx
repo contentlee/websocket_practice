@@ -18,6 +18,8 @@ const Button = ({ color = "primary", children, ...props }: Props) => {
         boxSizing: "border-box",
         transition: ".2s",
         cursor: "pointer",
+        fontSize: "14px",
+        fontFamily: "pretendard",
         whiteSpace: "nowrap",
         ...COLOR_VARIANTS[color],
       }}
