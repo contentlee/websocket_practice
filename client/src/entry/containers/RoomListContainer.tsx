@@ -1,29 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useOutletContext } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { Socket } from "socket.io-client";
 
-import AddIcon from "@assets/add_circle_icon.svg";
+import { alertAtom, modalAtom } from "@atoms/stateAtom";
 
-import { modalAtom } from "@atoms/stateAtom";
-
-import { palette } from "@utils/palette";
-
-import { RoomItem } from "../components";
-import { Icon } from "@components";
+import { AddItem, RoomItem } from "../components";
 
 import { EmptyListContainer } from ".";
 
+interface Room {
+  name: string;
+  length: number;
+  possible: boolean;
+}
+
 const RoomListContainer = () => {
   const navigate = useNavigate();
+
   const { socket } = useOutletContext<{ socket: Socket }>();
 
   const [_, setModal] = useRecoilState(modalAtom);
+  const [__, setAlert] = useRecoilState(alertAtom);
+
+  const [rooms, setRooms] = useState<Room[]>([]);
 
   const handleClickRoom = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
-    navigate(`/chat/${name}`);
+    console.log(name);
+    socket.emit("enter_room", name, () => {
+      navigate(`/chat/${name}`);
+    });
   };
 
   const handleClickCreate = (e: React.MouseEvent) => {
@@ -31,11 +39,34 @@ const RoomListContainer = () => {
     setModal({ isOpened: true, type: "create" });
   };
 
-  const [rooms, setRooms] = useState([]);
-
-  socket?.on("change_rooms", (list) => {
+  socket.on("change_rooms", (list) => {
     setRooms(list);
   });
+  socket.on("need_login", () => {
+    navigate("/login");
+    setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+  });
+
+  useEffect(() => {
+    socket.emit("show_room", (roomList: Room[]) => {
+      setRooms(roomList);
+    });
+  }, [socket]);
+
+  if (rooms.length === 0)
+    return (
+      <div
+        css={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          gap: "10px",
+        }}
+      >
+        <EmptyListContainer></EmptyListContainer>
+      </div>
+    );
+
   return (
     <div
       css={{
@@ -45,47 +76,19 @@ const RoomListContainer = () => {
         gap: "10px",
       }}
     >
-      {rooms.length === 0 ? (
-        <EmptyListContainer></EmptyListContainer>
-      ) : (
-        rooms.map(({ name, length }, i) => {
-          if (i === rooms.length - 1)
-            return (
-              <>
-                <RoomItem name={name} value={length} onClick={(e) => handleClickRoom(e, name)}></RoomItem>
-                <div
-                  css={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                  }}
-                  onClick={handleClickCreate}
-                >
-                  <hr
-                    css={{
-                      display: "flex",
-                      flex: "auto",
-                      height: "0.5px",
-                      background: palette.gray.gray83,
-                      border: "none",
-                    }}
-                  />
-                  <Icon src={AddIcon}></Icon>
-                  <hr
-                    css={{
-                      display: "flex",
-                      flex: "auto",
-                      height: "0.5px",
-                      background: palette.gray.gray83,
-                      border: "none",
-                    }}
-                  />
-                </div>
-              </>
-            );
-          return <RoomItem name={name} value={length} onClick={(e) => handleClickRoom(e, name)}></RoomItem>;
-        })
-      )}
+      {rooms.map(({ name, length, possible }) => {
+        console.log(possible);
+        return (
+          <RoomItem
+            key={name}
+            name={name}
+            value={length}
+            possible={possible}
+            onClick={possible ? (e) => handleClickRoom(e, name) : () => {}}
+          />
+        );
+      })}
+      <AddItem onClick={handleClickCreate} />
     </div>
   );
 };

@@ -1,4 +1,26 @@
+import { produce } from "immer";
 import { atom } from "recoil";
+
+interface Alert {
+  isOpened: boolean;
+  type: "success" | "error" | "warning";
+  children: React.ReactNode;
+}
+
+export const alertAtom = atom<Alert>({
+  key: "alertAtom",
+  default: {
+    isOpened: false,
+    type: "success",
+    children: "",
+  },
+});
+
+export const closeAlertAction = (prev: Alert) =>
+  produce(prev, (draft) => {
+    draft.isOpened = false;
+    return draft;
+  });
 
 interface Modal {
   isOpened: boolean;
@@ -12,3 +34,9 @@ export const modalAtom = atom<Modal>({
     type: "create",
   },
 });
+
+export const closeModalAction = (prev: Modal) =>
+  produce(prev, (draft) => {
+    draft.isOpened = false;
+    return draft;
+  });

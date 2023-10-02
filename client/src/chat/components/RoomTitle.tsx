@@ -1,11 +1,11 @@
 import { Regtangle } from "@components";
 import { HTMLAttributes } from "react";
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  name: string;
+  name?: string;
   length: number;
 }
 
-const RoomTitle = ({ name, length, ...props }: Props) => {
+const RoomTitle = ({ name = "익명의 채팅방", length, ...props }: Props) => {
   return (
     <div
       {...props}

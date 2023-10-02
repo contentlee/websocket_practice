@@ -20,7 +20,7 @@ const EntryPage = () => {
       }}
     >
       <Title>활성화된 채팅방</Title>
-      {modal.isOpened && modal.type === "create" && <CreateRoomModal></CreateRoomModal>}
+      <CreateRoomModal></CreateRoomModal>
       <RoomListContainer></RoomListContainer>
     </PageLayout>
   );

@@ -15,7 +15,7 @@ const InputMsg = () => {
       ref={textarea}
       rows={1}
       css={{
-        width: "100%",
+        flex: 1,
         minHeight: "42px",
         padding: "9px 20px",
         outline: "none",

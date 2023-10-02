@@ -1,13 +1,13 @@
 import { PageLayout } from "@components";
-import { MsgContainer, SendForm } from "../containers";
-import { RoomTitle } from "../components";
+
+import { MsgContainer, SendForm, TitleContainer } from "../containers";
 
 const ChatPage = () => {
   return (
-    <PageLayout>
-      <RoomTitle name="익명" length={2}></RoomTitle>
+    <PageLayout css={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <TitleContainer />
       <MsgContainer></MsgContainer>
-      <SendForm css={{}}></SendForm>
+      <SendForm></SendForm>
     </PageLayout>
   );
 };

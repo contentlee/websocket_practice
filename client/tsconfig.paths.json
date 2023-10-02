@@ -5,6 +5,8 @@
       "@components": ["src/common/components"],
       "@pages": ["src/common/pages"],
       "@login": ["src/login/pages"],
+      "@entry": ["src/entry/pages"],
+      "@chat": ["src/chat/pages"],
       "@atoms/*": ["src/atoms/*"],
       "@utils/*": ["src/utils/*"],
       "@assets/*": ["src/assets/*"]

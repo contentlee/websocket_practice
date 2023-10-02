@@ -2,9 +2,10 @@ import { palette } from "@utils/palette";
 import { HTMLAttributes } from "react";
 interface Props extends HTMLAttributes<HTMLDivElement> {
   name: string;
+  msg?: string;
 }
 
-const EnterMsg = ({ name, ...props }: Props) => {
+const EnterMsg = ({ name, msg = "", ...props }: Props) => {
   return (
     <div
       css={{
@@ -29,7 +30,7 @@ const EnterMsg = ({ name, ...props }: Props) => {
           fontSize: "14px",
         }}
       >
-        {name} 님이 참여하였습니다.
+        {name} {msg}
       </div>
       <hr
         css={{
