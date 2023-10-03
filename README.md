@@ -68,9 +68,9 @@ $ yarn start
 
 ```jsx
 src
-	├─assets
-	├─atoms
-	├─chat
+  ├─assets
+  ├─atoms
+  ├─chat
   │  ├─components
   │  ├─containers
   │  ├─contexts
