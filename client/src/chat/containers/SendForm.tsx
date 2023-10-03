@@ -1,8 +1,12 @@
-import { HTMLAttributes } from "react";
-import { Button } from "@components";
-import { InputMsg } from "../components";
+import { HTMLAttributes, useContext } from "react";
 import { useOutletContext, useParams } from "react-router";
 import { Socket } from "socket.io-client";
+
+import { Button } from "@components";
+import { InputMsg } from "../components";
+import { useRecoilValue } from "recoil";
+import { userAtom } from "@atoms/userAtom";
+import { HandlerContext } from "../contexts/ChatContext";
 
 interface Props extends HTMLAttributes<HTMLFormElement> {}
 
@@ -11,11 +15,16 @@ const SendForm = ({ ...props }: Props) => {
 
   const { name } = useParams();
 
+  const userInfo = useRecoilValue(userAtom);
+
+  const { handleAddMsg } = useContext(HandlerContext);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const target = e.currentTarget[0] as HTMLTextAreaElement;
     if (!target.value) return;
-    socket.emit("new_message", target.value, name, () => {
+    socket.emit("new_message", target.value, name, userInfo.name, () => {
+      handleAddMsg({ type: "from", date: new Date(), msg: target.value, user: userInfo.name });
       target.value = "";
     });
   };

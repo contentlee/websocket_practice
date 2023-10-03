@@ -1,14 +1,24 @@
-import { useRecoilState } from "recoil";
-import { Icon, Polygon, Regtangle } from "@components";
-import { palette } from "@utils/palette";
+import { useNavigate } from "react-router";
+import { useRecoilState, useRecoilValue } from "recoil";
+
 import AddIcon from "@assets/add_circle_icon.svg";
+
 import { modalAtom } from "@atoms/stateAtom";
+import { userAtom } from "@atoms/userAtom";
+
+import { palette } from "@utils/palette";
+
+import { Icon, Polygon, Regtangle } from "@components";
 
 const EmptyListContainer = () => {
+  const navigate = useNavigate();
+
+  const userInfo = useRecoilValue(userAtom);
   const [_, setModal] = useRecoilState(modalAtom);
 
   const handleClickCreate = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (userInfo.name === "") return navigate("/login");
     setModal({ isOpened: true, type: "create" });
   };
   return (

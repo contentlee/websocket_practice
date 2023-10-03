@@ -9,11 +9,13 @@ import { alertAtom, modalAtom } from "@atoms/stateAtom";
 import { AddItem, RoomItem } from "../components";
 
 import { EmptyListContainer } from ".";
+import { userAtom } from "@atoms/userAtom";
+import { produce } from "immer";
 
 interface Room {
   name: string;
-  length: number;
-  possible: boolean;
+  attendee: string[];
+  max_length: number;
 }
 
 const RoomListContainer = () => {
@@ -21,6 +23,7 @@ const RoomListContainer = () => {
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
+  const [userInfo, setUserInfo] = useRecoilState(userAtom);
   const [_, setModal] = useRecoilState(modalAtom);
   const [__, setAlert] = useRecoilState(alertAtom);
 
@@ -28,13 +31,21 @@ const RoomListContainer = () => {
 
   const handleClickRoom = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
-    socket.emit("enter_room", name, () => {
+    if (userInfo.name === "") return navigate("/login");
+    socket.emit("enter_room", name, userInfo.name, () => {
       navigate(`/chat/${name}`);
+      setUserInfo((prev) =>
+        produce(prev, (draft) => {
+          draft.room = name;
+          return draft;
+        })
+      );
     });
   };
 
   const handleClickCreate = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (userInfo.name === "") return navigate("/login");
     setModal({ isOpened: true, type: "create" });
   };
 
@@ -47,7 +58,7 @@ const RoomListContainer = () => {
   });
 
   useEffect(() => {
-    socket.emit("show_room", (roomList: Room[]) => {
+    socket.emit("get_rooms", userInfo.name, (roomList: Room[]) => {
       setRooms(roomList);
     });
   }, [socket]);
@@ -75,14 +86,14 @@ const RoomListContainer = () => {
         gap: "10px",
       }}
     >
-      {rooms.map(({ name, length, possible }) => {
+      {rooms.map(({ name, attendee, max_length }) => {
         return (
           <RoomItem
             key={name}
             name={name}
-            value={length}
-            possible={possible}
-            onClick={possible ? (e) => handleClickRoom(e, name) : () => {}}
+            value={attendee.length}
+            possible={attendee.length < max_length}
+            onClick={attendee.length < max_length ? (e) => handleClickRoom(e, name) : () => {}}
           />
         );
       })}

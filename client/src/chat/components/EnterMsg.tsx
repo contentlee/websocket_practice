@@ -1,5 +1,6 @@
-import { palette } from "@utils/palette";
 import { HTMLAttributes } from "react";
+
+import { palette } from "@utils/palette";
 interface Props extends HTMLAttributes<HTMLDivElement> {
   name: string;
   msg?: string;
@@ -30,7 +31,7 @@ const EnterMsg = ({ name, msg = "", ...props }: Props) => {
           fontSize: "14px",
         }}
       >
-        {name} {msg}
+        {msg}
       </div>
       <hr
         css={{

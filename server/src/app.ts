@@ -1,8 +1,12 @@
 import http from "http";
 import express from "express";
-import { Server, Socket } from "socket.io";
-import Events from "./socket/events";
-import WsServer from "./socket/server";
+import { Server } from "socket.io";
+import dotenv from "dotenv";
+
+import Database from "./libs/database";
+import { SocketEvent } from "./routers";
+
+dotenv.config();
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -16,9 +20,9 @@ const wsServer = new Server(httpServer, {
 
 httpServer.listen(8080, () => {
   console.log("listen on ws");
-
-  wsServer.on("connection", (socket) => {
-    new WsServer(wsServer, socket);
-    new Events();
+  Database.connect(() => {
+    wsServer.on("connection", (socket) => {
+      new SocketEvent(wsServer, socket);
+    });
   });
 });
