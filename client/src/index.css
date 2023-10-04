@@ -47,3 +47,13 @@ ul::-webkit-scrollbar-thumb {
   width: 4px;
   background-color: #dedede;
 }
+
+div::-webkit-scrollbar {
+  width: 4px;
+  background: transparent;
+}
+
+div::-webkit-scrollbar-thumb {
+  width: 4px;
+  background-color: #dedede;
+}

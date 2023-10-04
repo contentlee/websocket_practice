@@ -37,6 +37,7 @@ class SocketController {
   };
 
   public login = (userName: string, done: () => void) => {
+    this.service.login(userName, this.socket.id);
     done();
   };
 
@@ -89,14 +90,71 @@ class SocketController {
     }
   };
 
-  public leaveRoom = (roomName: string, userName: string) => {
+  public leaveRoom = (roomName: string, userName: string, done: () => void) => {
     try {
       this.service.leaveRoom(roomName, userName);
       this.socket.leave(roomName);
       this.socket.to(roomName).emit("bye", userName);
+      done();
     } catch (err) {
       console.log(err);
     }
+  };
+
+  public requireCall = (toUserName: string, fromUserName: string, done: () => void) => {
+    const userInfo = this.service.findUserId(toUserName);
+    if (userInfo) {
+      this.socket.join(fromUserName);
+      this.socket.to(userInfo.id).emit("require_call", fromUserName);
+      done();
+    } else {
+      this.socket.emit("not_found_user");
+    }
+  };
+
+  public permitCall = (fromUserName: string, done: () => void) => {
+    this.socket.join(fromUserName);
+    this.socket.to(fromUserName).emit("permit_call");
+    done();
+  };
+
+  public cancelCall = (fromUserName: string) => {
+    this.socket.to(fromUserName).emit("cancel_call");
+  };
+
+  public endCall = (fromUserName: string) => {
+    this.socket.leave(fromUserName);
+    this.socket.to(fromUserName).emit("end_call");
+  };
+
+  public requireVideoCall = (toUserName: string, fromUserName: string, done: () => void) => {
+    const userInfo = this.service.findUserId(toUserName);
+    if (userInfo) {
+      this.socket.join(fromUserName);
+      this.socket.to(userInfo.id).emit("require_video_call", fromUserName);
+      done();
+    } else {
+      this.socket.emit("not_found_user");
+    }
+  };
+
+  public permitVideoCall = (fromUserName: string, done: () => void) => {
+    this.socket.join(fromUserName);
+    this.socket.to(fromUserName).emit("permit_video_call");
+    done();
+  };
+
+  public cancelVideoCall = (fromUserName: string) => {
+    this.socket.to(fromUserName).emit("cancel_video_call");
+  };
+
+  public endVideoCall = (fromUserName: string) => {
+    this.socket.leave(fromUserName);
+    this.socket.to(fromUserName).emit("end_video_call");
+  };
+
+  public disconnecting = () => {
+    this.service.disconnecting(this.socket.id);
   };
 }
 

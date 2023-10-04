@@ -22,7 +22,7 @@ class ChatModel {
   }
 
   public addMessage(chat: Chat, name: string) {
-    return this.model.getCollection().updateOne({ name }, { $addToSet: { chat }, $inc: { cur_length: 1 } });
+    return this.model.getCollection().updateOne({ name }, { $addToSet: { chat } });
   }
 
   public attendUser(name: string, user: string, msg_index: number) {
@@ -30,7 +30,7 @@ class ChatModel {
   }
 
   public leaveUser(name: string, user: string) {
-    return this.model.getCollection().updateOne({ name }, { $pull: { attendee: user }, $inc: { cur_length: -1 } });
+    return this.model.getCollection().updateOne({ name }, { $pull: { attendee: { user } } });
   }
 }
 

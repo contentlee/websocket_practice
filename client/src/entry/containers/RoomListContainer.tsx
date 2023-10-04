@@ -34,12 +34,6 @@ const RoomListContainer = () => {
     if (userInfo.name === "") return navigate("/login");
     socket.emit("enter_room", name, userInfo.name, () => {
       navigate(`/chat/${name}`);
-      setUserInfo((prev) =>
-        produce(prev, (draft) => {
-          draft.room = name;
-          return draft;
-        })
-      );
     });
   };
 
@@ -61,7 +55,7 @@ const RoomListContainer = () => {
     socket.emit("get_rooms", userInfo.name, (roomList: Room[]) => {
       setRooms(roomList);
     });
-  }, [socket]);
+  });
 
   if (rooms.length === 0)
     return (

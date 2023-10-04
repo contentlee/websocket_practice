@@ -17,6 +17,8 @@ const LoginContainer = () => {
   const handleNameSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const input = e.currentTarget[0] as HTMLInputElement;
+    // 현재는 입력한다면 사용할 수 있도록 구현
+    // 추후 로그인 구현 예정
     socket.emit("login", input.value, () => {
       setUser((prev) =>
         produce(prev, (draft) => {

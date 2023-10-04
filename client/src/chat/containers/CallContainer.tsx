@@ -1,21 +1,17 @@
 import { useEffect, useRef, useState } from "react";
+
+import { alertAtom } from "@atoms/stateAtom";
+import { userAtom } from "@atoms/userAtom";
 import { useNavigate, useOutletContext } from "react-router";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { Socket } from "socket.io-client";
+import Select from "../components/Select";
+import { Button, Icon } from "@components";
 
-import CamOnIcon from "@assets/videocam_on_icon.svg";
-import CamOffIcon from "@assets/videocam_off_icon.svg";
 import AudioOnIcon from "@assets/mic_on_icon.svg";
 import AudioOffIcon from "@assets/mic_off_icon.svg";
 
-import { userAtom } from "@atoms/userAtom";
-
-import { Button, Icon } from "@components";
-
-import Select from "../components/Select";
-import { alertAtom } from "@atoms/stateAtom";
-
-const VideoContainer = () => {
+const CallContainer = () => {
   const navigate = useNavigate();
 
   const userInfo = useRecoilValue(userAtom);
@@ -23,41 +19,22 @@ const VideoContainer = () => {
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLVideoElement>(null);
 
   const [stream, setStream] = useState<MediaStream>();
 
-  const [onCam, setOnCam] = useState(false);
   const [onAudio, setOnAudio] = useState(false);
 
-  const [selectedCam, setSelectedCam] = useState<MediaStreamTrack>();
   const [selectedAudio, setSelectedAudio] = useState<MediaStreamTrack>();
 
   const [audioList, setAudioList] = useState<MediaDeviceInfo[]>([]);
-  const [camList, setCamList] = useState<MediaDeviceInfo[]>([]);
-
-  const handleChangeCam = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    e.preventDefault();
-    const value = e.target.value;
-    const mediaStream = await getMedia(selectedAudio!.id, value);
-    if (videoRef.current) videoRef.current.srcObject = mediaStream;
-    setStream(mediaStream);
-  };
 
   const handleChangeAudio = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
     const value = e.target.value;
-    const mediaStream = await getMedia(value, selectedCam!.id);
-    if (videoRef.current) videoRef.current.srcObject = mediaStream;
+    const mediaStream = await getMedia(value);
+    if (audioRef.current) audioRef.current.srcObject = mediaStream;
     setStream(mediaStream);
-  };
-
-  const handleClickCamToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    stream?.getVideoTracks().forEach((track) => {
-      track.enabled = !track.enabled;
-      setOnCam(track.enabled);
-    });
   };
 
   const handleClickAudioToggle = (e: React.MouseEvent) => {
@@ -73,10 +50,9 @@ const VideoContainer = () => {
     navigate(-1);
   };
 
-  const getMedia = (audio = "", video = "") => {
+  const getMedia = (audio = "") => {
     const constrains = {
       audio: audio !== "" ? { deviceId: audio } : true,
-      video: video !== "" ? { deviceId: video } : true,
     };
     return navigator.mediaDevices.getUserMedia(constrains);
   };
@@ -92,15 +68,12 @@ const VideoContainer = () => {
   const init = async () => {
     try {
       const mediaStream = await getMedia();
-      const { cam, audio } = await getDevices();
+      const { audio } = await getDevices();
 
-      if (videoRef.current) videoRef.current.srcObject = mediaStream;
+      if (audioRef.current) audioRef.current.srcObject = mediaStream;
       setStream(mediaStream);
-      setCamList(cam);
       setAudioList(audio);
       setSelectedAudio(mediaStream.getAudioTracks()[0]);
-      setSelectedCam(mediaStream.getVideoTracks()[0]);
-      setOnCam(true);
       setOnAudio(true);
     } catch (err) {
       console.log(err);
@@ -111,10 +84,10 @@ const VideoContainer = () => {
     init();
   }, []);
 
-  socket.on("permit_video_call", () => {
+  socket.on("permit_call", () => {
     setAlert({ isOpened: true, type: "success", children: "상대방과의 연결을 시작합니다." });
   });
-  socket.on("cancel_video_call", () => {
+  socket.on("cancel_call", () => {
     socket.emit("end_call", userInfo.name);
     navigate(-1);
   });
@@ -135,16 +108,26 @@ const VideoContainer = () => {
         overflow: "hidden",
       }}
     >
-      <video
+      <audio
         autoPlay
         playsInline
-        ref={videoRef}
+        ref={audioRef}
+        css={{
+          display: "none",
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+        }}
+      />
+      <div
         css={{
           position: "absolute",
           width: "100%",
           height: "100%",
         }}
-      ></video>
+      >
+        통화중
+      </div>
       <div
         css={{
           zIndex: 1000,
@@ -161,12 +144,8 @@ const VideoContainer = () => {
         }}
       >
         <Select defaultValue={selectedAudio?.id} option={audioList} onChange={handleChangeAudio}></Select>
-        <Select defaultValue={selectedCam?.id} option={camList} onChange={handleChangeCam}></Select>
 
         <div css={{ display: "flex", width: "100%" }}>
-          <Button css={{ flex: 1 / 3 }} onClick={handleClickCamToggle}>
-            <Icon src={onCam ? CamOnIcon : CamOffIcon}></Icon>
-          </Button>
           <Button css={{ flex: 1 / 3 }} onClick={handleClickAudioToggle}>
             <Icon src={onAudio ? AudioOnIcon : AudioOffIcon}></Icon>
           </Button>
@@ -179,4 +158,4 @@ const VideoContainer = () => {
   );
 };
 
-export default VideoContainer;
+export default CallContainer;
