@@ -17,6 +17,8 @@ const RoomTitle = ({ name = "익명의 채팅방", length, ...props }: Props) =>
         gap: "10px",
         color: palette.main.blk,
         boxSizing: "border-box",
+        userSelect: "none",
+        cursor: "pointer",
       }}
     >
       <Regtangle></Regtangle>

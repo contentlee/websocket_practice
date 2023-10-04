@@ -1,10 +1,12 @@
 import { ChatModel } from "../models";
-import { BaseRoom } from "../utils/types";
+import { clients } from "../utils/context";
 
 class SocketService {
   model = new ChatModel();
 
-  public login(user: string) {}
+  public login(user: string, id: string) {
+    clients.push({ user, id });
+  }
 
   public async checkRoom(name: string) {
     const room = await this.model.getRoom(name);
@@ -19,13 +21,12 @@ class SocketService {
       const user = room.attendee.find((v) => v.user === userName);
       if (!user) return { name, attendee: room.attendee, chat: [] };
 
-      let index = -10;
-      if (room.chat.length - user.msg_index - 10 < 0) index = room.chat.length - user.msg_index;
+      const chat = room.chat.splice(user.msg_index).slice(-20);
 
       const res = {
         name,
         attendee: room.attendee,
-        chat: room.chat.splice(-index),
+        chat,
       };
       return res;
     } catch (err) {
@@ -106,6 +107,16 @@ class SocketService {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  public findUserId(user: string) {
+    const userInfo = clients.find((v) => v.user === user);
+    return userInfo;
+  }
+
+  public disconnecting(id: string) {
+    const index = clients.findIndex((v) => v.id === id);
+    clients.splice(index, 1);
   }
 }
 

@@ -24,7 +24,7 @@ export const closeAlertAction = (prev: Alert) =>
 
 interface Modal {
   isOpened: boolean;
-  type: "create";
+  type: "create" | "attendeeList";
 }
 
 export const modalAtom = atom<Modal>({
@@ -40,3 +40,16 @@ export const closeModalAction = (prev: Modal) =>
     draft.isOpened = false;
     return draft;
   });
+
+interface Alarm {
+  isOpened: boolean;
+  type: "call" | "video";
+}
+
+export const alarmAtom = atom<Alarm>({
+  key: "alarmAtom",
+  default: {
+    isOpened: false,
+    type: "call",
+  },
+});

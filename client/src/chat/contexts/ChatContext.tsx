@@ -19,11 +19,13 @@ export interface Msg {
 
 interface Room {
   name: string;
-  attendee: string[];
+  attendee: { user: string; msg_index: number }[];
   chat: Msg[];
 }
 
 export const MsgContext = createContext<Msg[]>([]);
+
+export const AttendeeContext = createContext<Room["attendee"]>([]);
 
 export const HandlerContext = createContext({
   handleAddMsg: (msg: Msg) => {},
@@ -39,6 +41,7 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
 
   const [title, setTitle] = useState({ name: "익명", length: 0 });
   const [msgs, setMsgs] = useState<Msg[]>([]);
+  const [attendee, setAttendee] = useState<Room["attendee"]>([]);
 
   const handleAddMsg = (msg: Msg) => setMsgs([...msgs, msg]);
 
@@ -55,6 +58,8 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
           return room;
         });
         setMsgs(chat);
+
+        setAttendee(room.attendee);
       });
     }
   }, [socket, userInfo, name, navigate]);
@@ -62,7 +67,9 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
   return (
     <TitleContext.Provider value={title}>
       <MsgContext.Provider value={msgs}>
-        <HandlerContext.Provider value={{ handleAddMsg }}>{children}</HandlerContext.Provider>
+        <AttendeeContext.Provider value={attendee}>
+          <HandlerContext.Provider value={{ handleAddMsg }}>{children}</HandlerContext.Provider>
+        </AttendeeContext.Provider>
       </MsgContext.Provider>
     </TitleContext.Provider>
   );

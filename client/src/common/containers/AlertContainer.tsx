@@ -49,7 +49,7 @@ const AlertContainer = () => {
       }, 5000);
       return () => clearTimeout(fadeout);
     }
-  }, [alert]);
+  }, [alert, setAlert]);
 
   return (
     alert.isOpened &&

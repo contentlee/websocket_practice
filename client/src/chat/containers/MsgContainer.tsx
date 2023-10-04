@@ -38,12 +38,11 @@ const MsgContainer = () => {
 
   useEffect(() => {
     if (wrapRef.current) {
-      // 새로운 메세지가 생겨날 때마다 스크롤 최하단으로
-      // 단, 스크롤의 위치가 상위에 있을 경우 작동X
-      const clientHeight = wrapRef.current.clientHeight;
-      const curScroll = wrapRef.current.scrollTop;
+      // const clientHeight = wrapRef.current.clientHeight;
+      // const curScroll = wrapRef.current.scrollTop;
       const scrollHeight = wrapRef.current.scrollHeight;
-      if (clientHeight + curScroll > scrollHeight - 200) wrapRef.current.scrollTop = scrollHeight;
+      // if (clientHeight + curScroll > scrollHeight - 200)
+      wrapRef.current.scrollTop = scrollHeight;
     }
   }, [msgs]);
 

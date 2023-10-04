@@ -1,6 +1,6 @@
 import { PageLayout } from "@components";
 
-import { MsgContainer, SendForm, TitleContainer } from "../containers";
+import { MsgContainer, SendForm, TitleContainer, UserListModal } from "../containers";
 import { ChatContext } from "../contexts";
 
 const ChatPage = () => {
@@ -10,6 +10,7 @@ const ChatPage = () => {
         <TitleContainer />
         <MsgContainer></MsgContainer>
         <SendForm></SendForm>
+        <UserListModal></UserListModal>
       </ChatContext>
     </PageLayout>
   );
