@@ -1,4 +1,5 @@
 import { Regtangle } from "@components";
+import { palette } from "@utils/palette";
 import { HTMLAttributes } from "react";
 interface Props extends HTMLAttributes<HTMLDivElement> {
   name?: string;
@@ -13,6 +14,13 @@ const RoomTitle = ({ name = "익명의 채팅방", length, ...props }: Props) =>
         display: "flex",
         alignItems: "center",
         gap: "10px",
+        width: "100%",
+        maxWidth: "390px",
+        minWidth: "310px",
+        padding: "20px",
+        background: palette.background,
+        color: palette.main.blk,
+        boxSizing: "border-box",
       }}
     >
       <Regtangle></Regtangle>

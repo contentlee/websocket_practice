@@ -10,7 +10,7 @@ export const TitleContext = createContext({
   length: 0,
 });
 
-interface Msg {
+export interface Msg {
   type: string;
   date: Date;
   msg: string;

@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { Socket } from "socket.io-client/debug";
@@ -38,6 +38,8 @@ const MsgContainer = () => {
         display: "flex",
         flexDirection: "column",
         gap: "10px",
+        padding: "64px 20px 52px",
+        overflow: "auto",
       }}
     >
       {msgs.map(({ type, msg, user }, i) => {

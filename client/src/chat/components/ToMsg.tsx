@@ -14,7 +14,7 @@ const ToMsg = ({ name, msg, ...props }: Props) => {
         alignItems: "center",
         gap: "10px",
         width: "100%",
-        height: "42px",
+        minHeight: "42px",
         padding: "5px 10px",
         border: `1.5px solid ${palette.main.blk}`,
         boxSizing: "border-box",

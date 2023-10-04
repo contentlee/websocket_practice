@@ -14,7 +14,7 @@ const FromMsg = ({ msg, ...props }: Props) => {
         justifyContent: "flex-end",
         gap: "10px",
         width: "100%",
-        height: "42px",
+        minHeight: "42px",
         padding: "5px 10px",
         border: `1.5px solid ${palette.gray.gray83}`,
         boxSizing: "border-box",
