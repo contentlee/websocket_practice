@@ -1,20 +1,11 @@
-import { useEffect, useState } from "react";
-import { useParams, useOutletContext } from "react-router";
-import { Socket } from "socket.io-client";
+import { useContext } from "react";
 
 import { RoomTitle } from "../components";
+import { TitleContext } from "../contexts/ChatContext";
 
 const TitleContainer = () => {
-  const { name } = useParams();
+  const { name, length } = useContext(TitleContext);
 
-  const { socket } = useOutletContext<{ socket: Socket }>();
-  const [length, setLength] = useState(0);
-
-  useEffect(() => {
-    socket.emit("count_member", name, (roomSize: number) => {
-      setLength(roomSize);
-    });
-  }, [name, socket]);
   return <RoomTitle name={name} length={length}></RoomTitle>;
 };
 

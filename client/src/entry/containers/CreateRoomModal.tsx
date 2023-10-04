@@ -1,10 +1,11 @@
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router";
 import { useOutletContext } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Socket } from "socket.io-client";
 
 import { alertAtom, closeModalAction, modalAtom } from "@atoms/stateAtom";
+import { userAtom } from "@atoms/userAtom";
 
 import { palette } from "@utils/palette";
 
@@ -15,6 +16,8 @@ const CreateRoomModal = () => {
   const navigate = useNavigate();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
+
+  const userInfo = useRecoilValue(userAtom);
   const [{ isOpened }, setModal] = useRecoilState(modalAtom);
   const [_, setAlert] = useRecoilState(alertAtom);
 
@@ -29,7 +32,7 @@ const CreateRoomModal = () => {
 
     if (!roomName) return;
 
-    socket?.emit("create_room", roomName, maxLength ? maxLength : 100, notification, () => {
+    socket?.emit("create_room", roomName, maxLength ? maxLength : 100, notification, userInfo.name, () => {
       navigate(`/chat/${roomName}`);
     });
     setModal(closeModalAction);
