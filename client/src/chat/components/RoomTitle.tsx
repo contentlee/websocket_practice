@@ -11,14 +11,10 @@ const RoomTitle = ({ name = "익명의 채팅방", length, ...props }: Props) =>
     <div
       {...props}
       css={{
+        flex: 1,
         display: "flex",
         alignItems: "center",
         gap: "10px",
-        width: "100%",
-        maxWidth: "390px",
-        minWidth: "310px",
-        padding: "20px",
-        background: palette.background,
         color: palette.main.blk,
         boxSizing: "border-box",
       }}

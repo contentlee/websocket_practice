@@ -89,11 +89,12 @@ class SocketController {
     }
   };
 
-  public leaveRoom = (roomName: string, userName: string) => {
+  public leaveRoom = (roomName: string, userName: string, done: () => void) => {
     try {
       this.service.leaveRoom(roomName, userName);
       this.socket.leave(roomName);
       this.socket.to(roomName).emit("bye", userName);
+      done();
     } catch (err) {
       console.log(err);
     }
