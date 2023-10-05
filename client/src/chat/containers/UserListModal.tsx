@@ -1,5 +1,5 @@
 import { alertAtom, modalAtom } from "@atoms/stateAtom";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { AttendeeContext } from "../contexts/ChatContext";
@@ -23,9 +23,9 @@ const UserListModal = () => {
 
   const attendee = useContext(AttendeeContext);
 
-  const handleClickCall = (e: React.MouseEvent, user: string) => {
+  const handleClickCall = (e: React.MouseEvent, toUserName: string) => {
     e.preventDefault();
-    socket.emit("require_call", user, userInfo.name, () => {
+    socket.emit("require_call", toUserName, userInfo.name, () => {
       navigate("/call/" + userInfo.name);
     });
   };
@@ -37,9 +37,17 @@ const UserListModal = () => {
     });
   };
 
-  socket.on("not_found_user", () => {
-    setAlert({ isOpened: true, type: "error", children: "사용자가 접속하지 않은 상태입니다." });
-  });
+  useEffect(() => {
+    const notFoundUser = () => {
+      setAlert({ isOpened: true, type: "error", children: "사용자가 접속하지 않은 상태입니다." });
+    };
+
+    socket.on("not_found_user", notFoundUser);
+
+    return () => {
+      socket.off("not_found_user", notFoundUser);
+    };
+  }, []);
 
   return (
     isOpened &&
@@ -73,15 +81,17 @@ const UserListModal = () => {
               }}
             >
               <span>{user}</span>
-              <div
-                css={{
-                  display: "flex",
-                  gap: "8px",
-                }}
-              >
-                <Icon src={CallIcon} size="small" onClick={(e) => handleClickCall(e, user)}></Icon>
-                <Icon src={VideoCallIcon} size="small" onClick={(e) => handleClickVideoCall(e, user)}></Icon>
-              </div>
+              {user !== userInfo.name && (
+                <div
+                  css={{
+                    display: "flex",
+                    gap: "8px",
+                  }}
+                >
+                  <Icon src={CallIcon} size="small" onClick={(e) => handleClickCall(e, user)}></Icon>
+                  <Icon src={VideoCallIcon} size="small" onClick={(e) => handleClickVideoCall(e, user)}></Icon>
+                </div>
+              )}
             </div>
           );
         })}

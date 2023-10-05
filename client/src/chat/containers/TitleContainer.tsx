@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { Socket } from "socket.io-client";
@@ -20,14 +20,14 @@ const TitleContainer = () => {
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
-  const { name, length } = useContext(TitleContext);
+  const title = useContext(TitleContext);
 
   const userInfo = useRecoilValue(userAtom);
   const [_, setModal] = useRecoilState(modalAtom);
 
   const handleClickLeave = (e: React.MouseEvent) => {
     e.preventDefault();
-    socket.emit("leave_room", name, userInfo.name, () => {
+    socket.emit("leave_room", title.name, userInfo.name, () => {
       navigate("/");
     });
   };
@@ -36,6 +36,7 @@ const TitleContainer = () => {
     e.preventDefault();
     setModal({ isOpened: true, type: "attendeeList" });
   };
+
   return (
     <div
       css={{
@@ -60,7 +61,7 @@ const TitleContainer = () => {
           boxSizing: "border-box",
         }}
       >
-        <RoomTitle name={name} length={length} onClick={handleClickTitle}></RoomTitle>
+        <RoomTitle name={title.name} length={title.length} onClick={handleClickTitle}></RoomTitle>
         <Icon src={ExitIcon} size="small" onClick={handleClickLeave}></Icon>
       </div>
     </div>

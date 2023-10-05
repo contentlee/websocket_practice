@@ -19,22 +19,36 @@ const MsgContainer = () => {
   const { handleAddMsg } = useContext(HandlerContext);
   const [_, setAlert] = useRecoilState(alertAtom);
 
-  socket.on("need_login", () => {
-    navigate("/login");
-    setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
-  });
+  useEffect(() => {
+    const needLogin = () => {
+      navigate("/login");
+      setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+    };
 
-  socket.on("welcome", (user) => {
-    handleAddMsg({ type: "welcome", user, msg: `${user} 님이 참여하셨습니다.`, date: new Date() });
-  });
+    const welcome = (user: string) => {
+      handleAddMsg({ type: "welcome", user, msg: `${user} 님이 참여하셨습니다.`, date: new Date() });
+    };
 
-  socket?.on("new_message", (user, msg) => {
-    handleAddMsg({ type: "to", user, msg, date: new Date() });
-  });
+    const newMessage = (user: string, msg: string) => {
+      handleAddMsg({ type: "to", user, msg, date: new Date() });
+    };
 
-  socket.on("bye", (user) => {
-    handleAddMsg({ type: "bye", user, msg: `${user} 님이 퇴장하셨습니다.`, date: new Date() });
-  });
+    const bye = (user: string) => {
+      handleAddMsg({ type: "bye", user, msg: `${user} 님이 퇴장하셨습니다.`, date: new Date() });
+    };
+
+    socket.on("need_login", needLogin);
+    socket.on("welcome", welcome);
+    socket.on("new_message", newMessage);
+    socket.on("bye", bye);
+
+    return () => {
+      socket.off("need_login", needLogin);
+      socket.off("welcome", welcome);
+      socket.off("new_message", newMessage);
+      socket.off("bye", bye);
+    };
+  }, []);
 
   useEffect(() => {
     if (wrapRef.current) {
