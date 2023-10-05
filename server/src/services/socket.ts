@@ -7,6 +7,9 @@ class SocketService {
   public login(user: string, id: string) {
     clients.push({ user, id });
   }
+  public refresh(index: number, id: string) {
+    clients[index].id = id;
+  }
 
   public async checkRoom(name: string) {
     const room = await this.model.getRoom(name);
@@ -109,9 +112,12 @@ class SocketService {
     }
   }
 
+  public getUserIndex(user: string) {
+    return clients.findIndex((v) => v.user === user);
+  }
+
   public findUserId(user: string) {
-    const userInfo = clients.find((v) => v.user === user);
-    return userInfo;
+    return clients.find((v) => v.user === user);
   }
 
   public disconnecting(id: string) {

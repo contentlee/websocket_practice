@@ -20,6 +20,10 @@ class SocketEvent {
     this.socket.on("new_message", controller.sendMessage);
     this.socket.on("leave_room", controller.leaveRoom);
 
+    this.socket.on("offer", controller.offer);
+    this.socket.on("answer", controller.answer);
+    this.socket.on("icecandidate", controller.icecandidate);
+
     this.socket.on("require_call", controller.requireCall);
     this.socket.on("permit_call", controller.permitCall);
     this.socket.on("cancel_call", controller.cancelCall);

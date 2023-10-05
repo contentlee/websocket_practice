@@ -16,6 +16,14 @@ class SocketController {
     return this.socket.emit("need_login");
   }
 
+  public login = (userName: string, done: () => void) => {
+    const userIndex = this.service.getUserIndex(userName);
+    if (userIndex >= 0) this.service.refresh(userIndex, this.socket.id);
+    else this.service.login(userName, this.socket.id);
+    done();
+  };
+
+  // for chat
   public getRoom = async (roomName: string, userName: string, done: (room: BaseRoom) => void) => {
     if (!userName) return this.requireValidation();
     try {
@@ -34,11 +42,6 @@ class SocketController {
     } catch (err) {
       console.log(err);
     }
-  };
-
-  public login = (userName: string, done: () => void) => {
-    this.service.login(userName, this.socket.id);
-    done();
   };
 
   public createRoom = async (
@@ -71,7 +74,9 @@ class SocketController {
     try {
       const flag = await this.service.enterRoom(roomName, userName);
       this.socket.join(roomName);
-      if (!flag) this.socket.to(roomName).emit("welcome", userName);
+      if (!flag) {
+        this.socket.to(roomName).emit("welcome", userName);
+      }
       done();
     } catch (err) {
       console.log(err);
@@ -90,17 +95,19 @@ class SocketController {
     }
   };
 
-  public leaveRoom = (roomName: string, userName: string, done: () => void) => {
+  public leaveRoom = async (roomName: string, userName: string, done: () => void) => {
     try {
       this.service.leaveRoom(roomName, userName);
       this.socket.leave(roomName);
       this.socket.to(roomName).emit("bye", userName);
+
       done();
     } catch (err) {
       console.log(err);
     }
   };
 
+  /// for call
   public requireCall = (toUserName: string, fromUserName: string, done: () => void) => {
     const userInfo = this.service.findUserId(toUserName);
     if (userInfo) {
@@ -118,8 +125,23 @@ class SocketController {
     done();
   };
 
-  public cancelCall = (fromUserName: string) => {
+  public offer = (roomName: string, offer: RTCSessionDescriptionInit, done: () => void) => {
+    this.socket.to(roomName).emit("offer", offer);
+    done();
+  };
+
+  public answer = (roomName: string, answer: RTCSessionDescriptionInit, done: () => void) => {
+    this.socket.to(roomName).emit("answer", answer);
+    done();
+  };
+
+  public icecandidate = (roomName: string, ice: RTCPeerConnectionIceEvent) => {
+    this.socket.to(roomName).emit("icecandidate", ice);
+  };
+
+  public cancelCall = (fromUserName: string, done: () => void) => {
     this.socket.to(fromUserName).emit("cancel_call");
+    done();
   };
 
   public endCall = (fromUserName: string) => {

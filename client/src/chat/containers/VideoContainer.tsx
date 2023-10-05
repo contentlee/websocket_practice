@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router";
+import { useNavigate, useOutletContext, useParams } from "react-router";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { Socket } from "socket.io-client";
 
@@ -18,11 +18,18 @@ import { alertAtom } from "@atoms/stateAtom";
 const VideoContainer = () => {
   const navigate = useNavigate();
 
+  // common/AlarmContainer
+  const { socket } = useOutletContext<{ socket: Socket }>();
+  // room name
+  const { name } = useParams();
+
+  // user(me) information
   const userInfo = useRecoilValue(userAtom);
+
+  // common UI
   const [_, setAlert] = useRecoilState(alertAtom);
 
-  const { socket } = useOutletContext<{ socket: Socket }>();
-
+  // Video Stream
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [stream, setStream] = useState<MediaStream>();
@@ -36,6 +43,7 @@ const VideoContainer = () => {
   const [audioList, setAudioList] = useState<MediaDeviceInfo[]>([]);
   const [camList, setCamList] = useState<MediaDeviceInfo[]>([]);
 
+  // select Cam
   const handleChangeCam = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
     const value = e.target.value;
@@ -44,6 +52,7 @@ const VideoContainer = () => {
     setStream(mediaStream);
   };
 
+  // select Audio
   const handleChangeAudio = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
     const value = e.target.value;
@@ -52,6 +61,7 @@ const VideoContainer = () => {
     setStream(mediaStream);
   };
 
+  // visibel or invisible
   const handleClickCamToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     stream?.getVideoTracks().forEach((track) => {
@@ -60,6 +70,7 @@ const VideoContainer = () => {
     });
   };
 
+  // mute or unmute
   const handleClickAudioToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     stream?.getAudioTracks().forEach((track) => {
@@ -68,11 +79,13 @@ const VideoContainer = () => {
     });
   };
 
+  // return page
   const handleClickExit = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate(-1);
   };
 
+  // create stream
   const getMedia = (audio = "", video = "") => {
     const constrains = {
       audio: audio !== "" ? { deviceId: audio } : true,
@@ -81,6 +94,7 @@ const VideoContainer = () => {
     return navigator.mediaDevices.getUserMedia(constrains);
   };
 
+  // find all devices
   const getDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     return {
@@ -89,39 +103,113 @@ const VideoContainer = () => {
     };
   };
 
-  const init = async () => {
-    try {
-      const mediaStream = await getMedia();
-      const { cam, audio } = await getDevices();
+  // Connection
+  const [callState, setCallState] = useState("waiting");
 
-      if (videoRef.current) videoRef.current.srcObject = mediaStream;
-      setStream(mediaStream);
-      setCamList(cam);
-      setAudioList(audio);
-      setSelectedAudio(mediaStream.getAudioTracks()[0]);
-      setSelectedCam(mediaStream.getVideoTracks()[0]);
-      setOnCam(true);
-      setOnAudio(true);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const peerConnection = useRef<RTCPeerConnection>();
 
   useEffect(() => {
-    init();
-  }, []);
+    // video init
+    const videoInit = async () => {
+      try {
+        const mediaStream = await getMedia();
+        const { cam, audio } = await getDevices();
 
-  socket.on("permit_video_call", () => {
-    setAlert({ isOpened: true, type: "success", children: "상대방과의 연결을 시작합니다." });
-  });
-  socket.on("cancel_video_call", () => {
-    socket.emit("end_call", userInfo.name);
-    navigate(-1);
-  });
-  socket.on("end_call", () => {
-    setAlert({ isOpened: true, type: "warning", children: "상대방이 통화를 종료하였습니다." });
-    navigate(-1);
-  });
+        if (videoRef.current) videoRef.current.srcObject = mediaStream;
+        setStream(mediaStream);
+        setCamList(cam);
+        setAudioList(audio);
+        setSelectedAudio(mediaStream.getAudioTracks()[0]);
+        setSelectedCam(mediaStream.getVideoTracks()[0]);
+        setOnCam(true);
+        setOnAudio(true);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    videoInit();
+
+    // connection init
+    const handleIcecandidate = (data: RTCPeerConnectionIceEvent) => {
+      socket.emit("icecandidate", data.candidate);
+    };
+
+    const connection = new RTCPeerConnection();
+    connection.addEventListener("icecandidate", handleIcecandidate);
+    connection.ontrack = (e) => {
+      console.log(e);
+    };
+    stream?.getTracks().forEach((track) => connection.addTrack(track, stream));
+
+    peerConnection.current = connection;
+
+    // connecting
+    const cancelCall = () => {
+      socket.emit("end_call", userInfo.name);
+      navigate(-1);
+    };
+
+    const permitCall = async () => {
+      const offer = await peerConnection.current?.createOffer();
+      // send your offer (2)
+      socket.emit("offer", name, offer, () => {
+        setAlert({ isOpened: true, type: "success", children: "상대방과의 연결을 시작합니다." });
+      });
+    };
+
+    const receiveOffer = async (offer: RTCSessionDescriptionInit) => {
+      peerConnection.current?.setRemoteDescription(offer);
+      const answer = await peerConnection.current?.createAnswer();
+      peerConnection.current?.setLocalDescription(answer);
+      // send my answer (this name is roomname) (4)
+      socket.emit("answer", name, answer, () => {
+        setCallState("connect");
+      });
+    };
+
+    const receiveAnswer = async (answer: RTCSessionDescriptionInit) => {
+      await peerConnection.current?.setRemoteDescription(answer);
+    };
+
+    const icecandidate = async (ice: RTCIceCandidateInit) => {
+      await peerConnection.current?.addIceCandidate(ice);
+    };
+
+    const endCall = () => {
+      setAlert({ isOpened: true, type: "warning", children: "상대방이 통화를 종료하였습니다." });
+      navigate(-1);
+    };
+
+    // when partner reject your call
+    socket.on("cancel_call", cancelCall);
+
+    // when partner permit your call (1)
+    socket.on("permit_call", permitCall);
+
+    // receive partner's offer (3)
+    socket.on("offer", receiveOffer);
+
+    // receive partner's answer (5)
+    socket.on("answer", receiveAnswer);
+
+    socket.on("icecandidate", icecandidate);
+
+    // when partner end call
+    socket.on("end_call", endCall);
+
+    return () => {
+      if (peerConnection.current) {
+        peerConnection.current.close();
+      }
+
+      socket.off("cancel_call", cancelCall);
+      socket.off("permit_call", permitCall);
+      socket.off("offer", receiveOffer);
+      socket.off("answer", receiveAnswer);
+      socket.off("icecandidate", icecandidate);
+      socket.off("end_call", endCall);
+    };
+  }, [navigate, setAlert, name, socket, stream, userInfo.name]);
 
   return (
     <div

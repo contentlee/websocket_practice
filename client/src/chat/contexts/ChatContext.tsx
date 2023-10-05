@@ -1,9 +1,10 @@
 import { createContext, useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router";
 import { useRecoilValue } from "recoil";
+import { Socket } from "socket.io-client";
+import { produce } from "immer";
 
 import { userAtom } from "@atoms/userAtom";
-import { Socket } from "socket.io-client";
 
 export const TitleContext = createContext({
   name: "익명",
@@ -62,6 +63,40 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
         setAttendee(room.attendee);
       });
     }
+
+    const welcome = (userName: string) => {
+      setTitle((prev) =>
+        produce(prev, (draft) => {
+          draft.length++;
+          return draft;
+        })
+      );
+      setAttendee([...attendee, { user: userName, msg_index: 0 }]);
+    };
+    const leave = (userName: string) => {
+      setTitle((prev) =>
+        produce(prev, (draft) => {
+          draft.length--;
+          return draft;
+        })
+      );
+
+      setAttendee((prev) =>
+        produce(prev, (draft) => {
+          const index = draft.findIndex((v) => v.user === userName);
+          draft.splice(index, 1);
+          return draft;
+        })
+      );
+    };
+
+    socket.on("welcome", welcome);
+    socket.on("leave", leave);
+
+    return () => {
+      socket.off("welcome", welcome);
+      socket.off("leave", leave);
+    };
   }, [socket, userInfo, name, navigate]);
 
   return (

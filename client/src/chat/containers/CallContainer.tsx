@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate, useOutletContext, useParams } from "react-router";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { Socket } from "socket.io-client";
 
 import { alertAtom } from "@atoms/stateAtom";
 import { userAtom } from "@atoms/userAtom";
-import { useNavigate, useOutletContext } from "react-router";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { Socket } from "socket.io-client";
+
+import { palette } from "@utils/palette";
+
 import Select from "../components/Select";
+
 import { Button, Icon } from "@components";
 
 import AudioOnIcon from "@assets/mic_on_icon.svg";
@@ -14,21 +18,27 @@ import AudioOffIcon from "@assets/mic_off_icon.svg";
 const CallContainer = () => {
   const navigate = useNavigate();
 
+  // common/AlarmContainer
+  const { socket } = useOutletContext<{ socket: Socket }>();
+  // room name
+  const { name } = useParams();
+
+  // user(me) information
   const userInfo = useRecoilValue(userAtom);
+
+  // common UI
   const [_, setAlert] = useRecoilState(alertAtom);
 
-  const { socket } = useOutletContext<{ socket: Socket }>();
-
-  const audioRef = useRef<HTMLVideoElement>(null);
-
-  const [stream, setStream] = useState<MediaStream>();
+  // Audio Stream
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const [onAudio, setOnAudio] = useState(false);
 
+  const [stream, setStream] = useState<MediaStream>();
   const [selectedAudio, setSelectedAudio] = useState<MediaStreamTrack>();
-
   const [audioList, setAudioList] = useState<MediaDeviceInfo[]>([]);
 
+  // select audio
   const handleChangeAudio = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
     const value = e.target.value;
@@ -37,6 +47,7 @@ const CallContainer = () => {
     setStream(mediaStream);
   };
 
+  // mute or unmute
   const handleClickAudioToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     stream?.getAudioTracks().forEach((track) => {
@@ -45,11 +56,13 @@ const CallContainer = () => {
     });
   };
 
+  // return page
   const handleClickExit = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate(-1);
   };
 
+  // create stream
   const getMedia = (audio = "") => {
     const constrains = {
       audio: audio !== "" ? { deviceId: audio } : true,
@@ -57,44 +70,116 @@ const CallContainer = () => {
     return navigator.mediaDevices.getUserMedia(constrains);
   };
 
+  // find all devices
   const getDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    return {
-      cam: devices.filter((device) => device.kind === "videoinput"),
-      audio: devices.filter((device) => device.kind === "audioinput"),
-    };
+    return devices.filter((device) => device.kind === "audioinput");
   };
 
-  const init = async () => {
-    try {
-      const mediaStream = await getMedia();
-      const { audio } = await getDevices();
+  // Connection
+  const [callState, setCallState] = useState("waiting");
 
-      if (audioRef.current) audioRef.current.srcObject = mediaStream;
-      setStream(mediaStream);
-      setAudioList(audio);
-      setSelectedAudio(mediaStream.getAudioTracks()[0]);
-      setOnAudio(true);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const peerConnection = useRef<RTCPeerConnection>();
 
   useEffect(() => {
-    init();
-  }, []);
+    // audio init
+    const audioInit = async () => {
+      try {
+        const mediaStream = await getMedia();
+        const audio = await getDevices();
 
-  socket.on("permit_call", () => {
-    setAlert({ isOpened: true, type: "success", children: "상대방과의 연결을 시작합니다." });
-  });
-  socket.on("cancel_call", () => {
-    socket.emit("end_call", userInfo.name);
-    navigate(-1);
-  });
-  socket.on("end_call", () => {
-    setAlert({ isOpened: true, type: "warning", children: "상대방이 통화를 종료하였습니다." });
-    navigate(-1);
-  });
+        if (audioRef.current) audioRef.current.srcObject = mediaStream;
+        setStream(mediaStream);
+        setAudioList(audio);
+        setSelectedAudio(mediaStream.getAudioTracks()[0]);
+        setOnAudio(true);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    audioInit();
+
+    // connection init
+    const handleIcecandidate = (data: RTCPeerConnectionIceEvent) => {
+      socket.emit("icecandidate", data.candidate);
+    };
+
+    const connection = new RTCPeerConnection();
+    connection.addEventListener("icecandidate", handleIcecandidate);
+    connection.ontrack = (e) => {
+      console.log(e);
+    };
+    stream?.getTracks().forEach((track) => connection.addTrack(track, stream));
+
+    peerConnection.current = connection;
+
+    // connecting
+    const cancelCall = () => {
+      socket.emit("end_call", userInfo.name);
+      navigate(-1);
+    };
+
+    const permitCall = async () => {
+      const offer = await peerConnection.current?.createOffer();
+      // send your offer (2)
+      socket.emit("offer", name, offer, () => {
+        setAlert({ isOpened: true, type: "success", children: "상대방과의 연결을 시작합니다." });
+      });
+    };
+
+    const receiveOffer = async (offer: RTCSessionDescriptionInit) => {
+      peerConnection.current?.setRemoteDescription(offer);
+      const answer = await peerConnection.current?.createAnswer();
+      peerConnection.current?.setLocalDescription(answer);
+      // send my answer (this name is roomname) (4)
+      socket.emit("answer", name, answer, () => {
+        setCallState("connect");
+      });
+    };
+
+    const receiveAnswer = async (answer: RTCSessionDescriptionInit) => {
+      await peerConnection.current?.setRemoteDescription(answer);
+    };
+
+    const icecandidate = async (ice: RTCIceCandidateInit) => {
+      await peerConnection.current?.addIceCandidate(ice);
+    };
+
+    const endCall = () => {
+      setAlert({ isOpened: true, type: "warning", children: "상대방이 통화를 종료하였습니다." });
+      navigate(-1);
+    };
+
+    // when partner reject your call
+    socket.on("cancel_call", cancelCall);
+
+    // when partner permit your call (1)
+    socket.on("permit_call", permitCall);
+
+    // receive partner's offer (3)
+    socket.on("offer", receiveOffer);
+
+    // receive partner's answer (5)
+    socket.on("answer", receiveAnswer);
+
+    socket.on("icecandidate", icecandidate);
+
+    // when partner end call
+    socket.on("end_call", endCall);
+
+    return () => {
+      if (peerConnection.current) {
+        peerConnection.current.close();
+      }
+
+      socket.off("cancel_call", cancelCall);
+      socket.off("permit_call", permitCall);
+      socket.off("offer", receiveOffer);
+      socket.off("answer", receiveAnswer);
+      socket.off("icecandidate", icecandidate);
+      socket.off("end_call", endCall);
+    };
+  }, [navigate, setAlert, name, socket, stream, userInfo.name]);
 
   return (
     <div
@@ -109,24 +194,51 @@ const CallContainer = () => {
       }}
     >
       <audio
+        muted
         autoPlay
         playsInline
         ref={audioRef}
         css={{
           display: "none",
-          position: "absolute",
-          width: "100%",
-          height: "100%",
         }}
       />
       <div
         css={{
           position: "absolute",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
           width: "100%",
           height: "100%",
         }}
       >
-        통화중
+        {audioList.length ? (
+          <div
+            css={{
+              padding: "16px 32px",
+              background: callState === "connect" ? palette.point.green : palette.point.red,
+              color: palette.main.wht,
+              fontSize: "16px",
+              fontWeight: 700,
+              userSelect: "none",
+            }}
+          >
+            {callState === "connect" ? "통화중" : "연결중"}
+          </div>
+        ) : (
+          <div
+            css={{
+              padding: "16px 32px",
+              background: palette.point.yellow,
+              color: palette.main.wht,
+              fontSize: "16px",
+              fontWeight: 700,
+              userSelect: "none",
+            }}
+          >
+            마이크에 대한 접근이 필요합니다.
+          </div>
+        )}
       </div>
       <div
         css={{
@@ -146,10 +258,10 @@ const CallContainer = () => {
         <Select defaultValue={selectedAudio?.id} option={audioList} onChange={handleChangeAudio}></Select>
 
         <div css={{ display: "flex", width: "100%" }}>
-          <Button css={{ flex: 1 / 3 }} onClick={handleClickAudioToggle}>
+          <Button css={{ flex: 1 / 2 }} onClick={handleClickAudioToggle}>
             <Icon src={onAudio ? AudioOnIcon : AudioOffIcon}></Icon>
           </Button>
-          <Button css={{ flex: 1 / 3 }} color="secondary" onClick={handleClickExit}>
+          <Button css={{ flex: 1 / 2 }} color="secondary" onClick={handleClickExit}>
             나가기
           </Button>
         </div>

@@ -11,6 +11,7 @@ import { palette } from "@utils/palette";
 
 import { Button, Input, TextArea } from "@components";
 import { Title } from "../components";
+import { useEffect } from "react";
 
 const CreateRoomModal = () => {
   const navigate = useNavigate();
@@ -43,14 +44,24 @@ const CreateRoomModal = () => {
     setModal(closeModalAction);
   };
 
-  socket.on("need_login", () => {
-    navigate("/login");
-    setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
-  });
+  useEffect(() => {
+    const needLogin = () => {
+      navigate("/login");
+      setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+    };
 
-  socket.on("duplicated_name", () => {
-    setAlert({ isOpened: true, type: "error", children: "중복된 채팅방이 존재합니다." });
-  });
+    const duplicatedName = () => {
+      setAlert({ isOpened: true, type: "error", children: "중복된 채팅방이 존재합니다." });
+    };
+
+    socket.on("need_login", needLogin);
+    socket.on("duplicated_name", duplicatedName);
+
+    return () => {
+      socket.off("need_login", needLogin);
+      socket.off("duplicated_name", duplicatedName);
+    };
+  }, []);
 
   return (
     isOpened &&

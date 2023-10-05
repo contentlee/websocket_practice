@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { createPortal } from "react-dom";
 import { useRecoilState } from "recoil";
@@ -38,24 +38,33 @@ const AlarmContainer = ({ socket }: Props) => {
 
   const handleClickCallPermit = (e: React.MouseEvent) => {
     e.preventDefault();
-    socket.emit("permit_call", name);
-    navigate("/call" + name);
+    socket.emit("permit_call", name, () => {
+      setAlarm((prev) =>
+        produce(prev, (draft) => {
+          draft.isOpened = false;
+          return draft;
+        })
+      );
+      navigate("/call/" + name);
+    });
   };
   const handleClickCallCancel = (e: React.MouseEvent) => {
     e.preventDefault();
-    socket.emit("cancel_call");
-    setAlarm((prev) =>
-      produce(prev, (draft) => {
-        draft.isOpened = false;
-        return draft;
-      })
-    );
+    socket.emit("cancel_call", name, () => {
+      setAlarm((prev) =>
+        produce(prev, (draft) => {
+          draft.isOpened = false;
+          return draft;
+        })
+      );
+    });
   };
 
   const handleClickVideoCallPermit = (e: React.MouseEvent) => {
     e.preventDefault();
-    socket.emit("permit_video_call");
-    navigate("/video" + name);
+    socket.emit("permit_video_call", () => {
+      navigate("/video/" + name);
+    });
   };
 
   const handleClickVideoCallCancel = (e: React.MouseEvent) => {
@@ -69,21 +78,27 @@ const AlarmContainer = ({ socket }: Props) => {
     );
   };
 
-  socket.on("require_call", (userName) => {
-    setAlarm({ isOpened: true, type: "call" });
-    setName(userName);
-  });
+  useEffect(() => {
+    const requireCall = (userName: string) => {
+      setAlarm({ isOpened: true, type: "call" });
+      setName(userName);
+    };
 
-  socket.on("require_video_call", (userName) => {
-    setAlarm({ isOpened: true, type: "video" });
-    setName(userName);
-  });
+    const requireVideoCall = (userName: string) => {
+      setAlarm({ isOpened: true, type: "video" });
+      setName(userName);
+    };
+
+    socket.on("require_call", requireCall);
+    socket.on("require_video_call", requireVideoCall);
+  }, []);
 
   return (
     alarm.isOpened &&
     createPortal(
       <div
         css={{
+          zIndex: 1500,
           position: "absolute",
           bottom: 0,
         }}

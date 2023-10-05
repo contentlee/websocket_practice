@@ -43,19 +43,27 @@ const RoomListContainer = () => {
     setModal({ isOpened: true, type: "create" });
   };
 
-  socket.on("change_rooms", (list) => {
-    setRooms(list);
-  });
-  socket.on("need_login", () => {
-    navigate("/login");
-    setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
-  });
-
   useEffect(() => {
     socket.emit("get_rooms", userInfo.name, (roomList: Room[]) => {
       setRooms(roomList);
     });
-  });
+
+    const changeRoom = (list: Room[]) => {
+      setRooms(list);
+    };
+    const needLogin = () => {
+      navigate("/login");
+      setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+    };
+
+    socket.on("change_rooms", changeRoom);
+    socket.on("need_login", needLogin);
+
+    return () => {
+      socket.off("change_rooms", changeRoom);
+      socket.off("need_login", needLogin);
+    };
+  }, []);
 
   if (rooms.length === 0)
     return (

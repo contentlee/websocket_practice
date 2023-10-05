@@ -29,6 +29,8 @@ const Select = ({ option, ...props }: Props) => {
             css={{
               height: "42px",
               padding: "10px",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
             }}
           >
             {label}
