@@ -1,19 +1,26 @@
-import { alertAtom, modalAtom } from "@atoms/stateAtom";
 import { useContext, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate, useOutletContext } from "react-router";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { AttendeeContext } from "../contexts/ChatContext";
-import { palette } from "@utils/palette";
-import { Icon } from "@components";
+import { Socket } from "socket.io-client";
 
 import CallIcon from "@assets/call_icon.svg";
 import VideoCallIcon from "@assets/video_call_icon.svg";
-import { useNavigate, useOutletContext } from "react-router";
-import { Socket } from "socket.io-client";
+
+import { palette } from "@utils/palette";
+
+import { alertAtom, modalAtom } from "@atoms/stateAtom";
 import { userAtom } from "@atoms/userAtom";
+
+import { useAnimate } from "@hooks";
+
+import { Icon } from "@components";
+
+import { AttendeeContext } from "../contexts";
 
 const UserListModal = () => {
   const navigate = useNavigate();
+  const [animation, setAnimation] = useAnimate();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
@@ -38,6 +45,10 @@ const UserListModal = () => {
   };
 
   useEffect(() => {
+    setAnimation({ type: "fadeIn", callback: () => {} });
+  }, [setAnimation]);
+
+  useEffect(() => {
     const notFoundUser = () => {
       setAlert({ isOpened: true, type: "error", children: "사용자가 접속하지 않은 상태입니다." });
     };
@@ -47,7 +58,7 @@ const UserListModal = () => {
     return () => {
       socket.off("not_found_user", notFoundUser);
     };
-  }, []);
+  }, [setAlert, socket]);
 
   return (
     isOpened &&
@@ -64,6 +75,7 @@ const UserListModal = () => {
           paddingTop: "20px",
           border: "1.5px solid" + palette.main.blk,
           background: palette.background,
+          animation: animation ? animation + ".2s forwards ease-out" : "",
         }}
       >
         {attendee.map(({ user }) => {

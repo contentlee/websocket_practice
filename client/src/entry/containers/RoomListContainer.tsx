@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useOutletContext } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { Socket } from "socket.io-client";
 
 import { alertAtom, modalAtom } from "@atoms/stateAtom";
@@ -10,7 +10,7 @@ import { AddItem, RoomItem } from "../components";
 
 import { EmptyListContainer } from ".";
 import { userAtom } from "@atoms/userAtom";
-import { produce } from "immer";
+import { useAnimate } from "@hooks";
 
 interface Room {
   name: string;
@@ -21,9 +21,11 @@ interface Room {
 const RoomListContainer = () => {
   const navigate = useNavigate();
 
+  const [animation, setAnimation] = useAnimate();
+
   const { socket } = useOutletContext<{ socket: Socket }>();
 
-  const [userInfo, setUserInfo] = useRecoilState(userAtom);
+  const userInfo = useRecoilValue(userAtom);
   const [_, setModal] = useRecoilState(modalAtom);
   const [__, setAlert] = useRecoilState(alertAtom);
 
@@ -31,16 +33,37 @@ const RoomListContainer = () => {
 
   const handleClickRoom = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
-    if (userInfo.name === "") return navigate("/login");
-    socket.emit("enter_room", name, userInfo.name, () => {
-      navigate(`/chat/${name}`);
-    });
+    if (userInfo.name === "") {
+      setAnimation({
+        type: "fadeOut",
+        callback: () => {
+          navigate("/login");
+        },
+      });
+    } else {
+      socket.emit("enter_room", name, userInfo.name, () => {
+        setAnimation({
+          type: "fadeOut",
+          callback: () => {
+            navigate(`/chat/${name}`);
+          },
+        });
+      });
+    }
   };
 
   const handleClickCreate = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (userInfo.name === "") return navigate("/login");
-    setModal({ isOpened: true, type: "create" });
+    if (userInfo.name === "") {
+      setAnimation({
+        type: "fadeOut",
+        callback: () => {
+          navigate("/login");
+        },
+      });
+    } else {
+      setModal({ isOpened: true, type: "create" });
+    }
   };
 
   useEffect(() => {
@@ -52,8 +75,13 @@ const RoomListContainer = () => {
       setRooms(list);
     };
     const needLogin = () => {
-      navigate("/login");
-      setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+      setAnimation({
+        type: "fadeOut",
+        callback: () => {
+          navigate("/login");
+          setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+        },
+      });
     };
 
     socket.on("change_rooms", changeRoom);
@@ -63,7 +91,7 @@ const RoomListContainer = () => {
       socket.off("change_rooms", changeRoom);
       socket.off("need_login", needLogin);
     };
-  }, []);
+  }, [navigate, setAlert, setAnimation, socket, userInfo.name]);
 
   if (rooms.length === 0)
     return (
@@ -86,6 +114,7 @@ const RoomListContainer = () => {
         flexDirection: "column",
         width: "100%",
         gap: "10px",
+        animation: animation ? animation + ".2s forwards ease-out" : "",
       }}
     >
       {rooms.map(({ name, attendee, max_length }) => {

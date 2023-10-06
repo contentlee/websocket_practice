@@ -97,7 +97,7 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
       socket.off("welcome", welcome);
       socket.off("leave", leave);
     };
-  }, [socket, userInfo, name, navigate]);
+  }, [socket, userInfo, name, attendee, navigate]);
 
   return (
     <TitleContext.Provider value={title}>

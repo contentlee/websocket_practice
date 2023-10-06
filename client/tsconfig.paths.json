@@ -2,14 +2,15 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@components": ["src/common/components"],
-      "@pages": ["src/common/pages"],
-      "@login": ["src/login/pages"],
-      "@entry": ["src/entry/pages"],
-      "@chat": ["src/chat/pages"],
+      "@assets/*": ["src/assets/*"],
       "@atoms/*": ["src/atoms/*"],
-      "@utils/*": ["src/utils/*"],
-      "@assets/*": ["src/assets/*"]
+      "@chat": ["src/chat/pages"],
+      "@components": ["src/common/components"],
+      "@entry": ["src/entry/pages"],
+      "@hooks": ["src/hooks"],
+      "@login": ["src/login/pages"],
+      "@pages": ["src/common/pages"],
+      "@utils/*": ["src/utils/*"]
     }
   }
 }

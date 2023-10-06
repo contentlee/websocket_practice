@@ -1,10 +1,15 @@
-import { HTMLAttributes } from "react";
+import { useAnimate } from "@hooks";
+import { HTMLAttributes, useEffect } from "react";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
 const PageLayout = ({ children, ...props }: Props) => {
+  const [animation, setAnimation] = useAnimate();
+  useEffect(() => {
+    setAnimation({ type: "fadeIn", callback: () => {} });
+  }, [setAnimation]);
   return (
     <div
       css={{
@@ -15,6 +20,7 @@ const PageLayout = ({ children, ...props }: Props) => {
         padding: "20px",
         boxSizing: "border-box",
         overflow: "auto",
+        animation: animation && animation + ".2s forwards ease-out",
       }}
       {...props}
     >

@@ -23,8 +23,9 @@ const RoomItem = ({ name, value, possible, ...props }: Props) => {
         fontSize: "14px",
         color: palette.main.blk,
         cursor: possible ? "pointer" : "none",
+        transition: ".1s ease-in-out",
         "&:hover": {
-          filter: possible ? "scale(120%)" : "scale(100%)",
+          transform: possible ? "scale(105%)" : "scale(100%)",
         },
       }}
       {...props}

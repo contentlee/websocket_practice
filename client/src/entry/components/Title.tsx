@@ -13,6 +13,7 @@ const Title = ({ type = "list", children }: Props) => {
         gap: "10px",
         fontSize: "14px",
         color: palette.gray.gray52,
+        userSelect: "none",
       }}
     >
       <div>{children}</div>

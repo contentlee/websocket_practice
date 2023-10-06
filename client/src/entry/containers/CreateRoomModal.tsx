@@ -12,9 +12,12 @@ import { palette } from "@utils/palette";
 import { Button, Input, TextArea } from "@components";
 import { Title } from "../components";
 import { useEffect } from "react";
+import { useAnimate } from "@hooks";
 
 const CreateRoomModal = () => {
   const navigate = useNavigate();
+
+  const [animation, setAnimation] = useAnimate();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
@@ -34,9 +37,14 @@ const CreateRoomModal = () => {
     if (!roomName) return;
 
     socket?.emit("create_room", roomName, maxLength ? maxLength : 100, notification, userInfo.name, () => {
-      navigate(`/chat/${roomName}`);
+      setAnimation({
+        type: "fadeOut",
+        callback: () => {
+          navigate(`/chat/${roomName}`);
+          setModal(closeModalAction);
+        },
+      });
     });
-    setModal(closeModalAction);
   };
 
   const handleClickCancel = (e: React.MouseEvent) => {
@@ -46,8 +54,14 @@ const CreateRoomModal = () => {
 
   useEffect(() => {
     const needLogin = () => {
-      navigate("/login");
       setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+
+      setAnimation({
+        type: "fadeOut",
+        callback: () => {
+          navigate("/login");
+        },
+      });
     };
 
     const duplicatedName = () => {
@@ -61,8 +75,11 @@ const CreateRoomModal = () => {
       socket.off("need_login", needLogin);
       socket.off("duplicated_name", duplicatedName);
     };
-  }, []);
+  }, [navigate, setAlert, setAnimation, socket]);
 
+  useEffect(() => {
+    setAnimation({ type: "fadeIn", callback: () => {} });
+  }, [setAnimation]);
   return (
     isOpened &&
     createPortal(
@@ -81,6 +98,7 @@ const CreateRoomModal = () => {
           border: "1.5px solid" + palette.main.blk,
           background: palette.background,
           boxSizing: "border-box",
+          animation: animation ? animation + ".2s forwards ease-in-out" : "",
         }}
         onSubmit={handleSubmit}
       >
