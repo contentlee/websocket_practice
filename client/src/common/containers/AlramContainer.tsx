@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { createPortal } from "react-dom";
 import { useRecoilState } from "recoil";
 import { Socket } from "socket.io-client";
-import { keyframes } from "@emotion/react";
 
 import { palette } from "@utils/palette";
 import { alarmAtom } from "@atoms/stateAtom";
@@ -15,68 +14,96 @@ import VedioCallIcon from "@assets/video_call_icon_wht.svg";
 import CallRejectIcon from "@assets/call_reject_icon.svg";
 import CancelIcon from "@assets/close_icon.svg";
 import { produce } from "immer";
+import { useAnimate } from "@hooks";
 
 interface Props {
   socket: Socket;
 }
 
-const animate = keyframes`
-  0% {
-    opacity: 0;
-    transform: translateY(-50px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0px);
-  }
-`;
-
 const AlarmContainer = ({ socket }: Props) => {
   const navigate = useNavigate();
+
+  const [animation, setAnimation] = useAnimate();
+
   const [alarm, setAlarm] = useRecoilState(alarmAtom);
   const [name, setName] = useState("");
 
   const handleClickCallPermit = (e: React.MouseEvent) => {
     e.preventDefault();
     socket.emit("permit_call", name, () => {
-      setAlarm((prev) =>
-        produce(prev, (draft) => {
-          draft.isOpened = false;
-          return draft;
-        })
-      );
-      navigate("/call/" + name);
+      setAnimation({
+        type: "closeAlarm",
+        time: 600,
+        callback: () => {
+          setAlarm((prev) =>
+            produce(prev, (draft) => {
+              draft.isOpened = false;
+              return draft;
+            })
+          );
+          navigate("/call/" + name);
+        },
+      });
     });
   };
   const handleClickCallCancel = (e: React.MouseEvent) => {
     e.preventDefault();
     socket.emit("cancel_call", name, () => {
-      setAlarm((prev) =>
-        produce(prev, (draft) => {
-          draft.isOpened = false;
-          return draft;
-        })
-      );
+      setAnimation({
+        type: "closeAlarm",
+        time: 600,
+        callback: () => {
+          setAlarm((prev) =>
+            produce(prev, (draft) => {
+              draft.isOpened = false;
+              return draft;
+            })
+          );
+        },
+      });
     });
   };
 
   const handleClickVideoCallPermit = (e: React.MouseEvent) => {
     e.preventDefault();
     socket.emit("permit_video_call", () => {
-      navigate("/video/" + name);
+      setAnimation({
+        type: "closeAlarm",
+        time: 600,
+        callback: () => {
+          setAlarm((prev) =>
+            produce(prev, (draft) => {
+              draft.isOpened = false;
+              return draft;
+            })
+          );
+          navigate("/video/" + name);
+        },
+      });
     });
   };
 
   const handleClickVideoCallCancel = (e: React.MouseEvent) => {
     e.preventDefault();
-    socket.emit("cancel_video_call");
-    setAlarm((prev) =>
-      produce(prev, (draft) => {
-        draft.isOpened = false;
-        return draft;
-      })
-    );
+    socket.emit("cancel_video_call", name, () => {
+      setAnimation({
+        type: "closeAlarm",
+        time: 600,
+        callback: () => {
+          setAlarm((prev) =>
+            produce(prev, (draft) => {
+              draft.isOpened = false;
+              return draft;
+            })
+          );
+        },
+      });
+    });
   };
+
+  useEffect(() => {
+    setAnimation({ type: "showAlarm", time: 600, callback: () => {} });
+  }, [setAnimation]);
 
   useEffect(() => {
     const requireCall = (userName: string) => {
@@ -91,7 +118,7 @@ const AlarmContainer = ({ socket }: Props) => {
 
     socket.on("require_call", requireCall);
     socket.on("require_video_call", requireVideoCall);
-  }, []);
+  }, [setAlarm, socket]);
 
   return (
     alarm.isOpened &&
@@ -123,7 +150,7 @@ const AlarmContainer = ({ socket }: Props) => {
               borderRadius: 50,
               background: palette.point.green,
               boxShadow: "2px 2px 10px 1px rgba(0,0,0,.2)",
-              animation: animate + ".5s ease-in forwards",
+              animation: animation + ".5s ease-in forwards",
               overflow: "hidden",
             }}
           >
@@ -141,7 +168,7 @@ const AlarmContainer = ({ socket }: Props) => {
               borderRadius: 50,
               background: palette.point.red,
               boxShadow: "2px 2px 10px 1px rgba(0,0,0,.2)",
-              animation: animate + ".5s ease-in forwards",
+              animation: animation + ".5s ease-in forwards",
               overflow: "hidden",
             }}
           >

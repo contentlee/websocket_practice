@@ -8,9 +8,13 @@ import { alertAtom } from "@atoms/stateAtom";
 import { EnterMsg, FromMsg, ToMsg } from "../components";
 
 import { HandlerContext, MsgContext } from "../contexts/ChatContext";
+import { useAnimate } from "@hooks";
 
 const MsgContainer = () => {
   const navigate = useNavigate();
+
+  const [animation, setAnimation] = useAnimate();
+
   const { socket } = useOutletContext<{ socket: Socket }>();
 
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -21,8 +25,13 @@ const MsgContainer = () => {
 
   useEffect(() => {
     const needLogin = () => {
-      navigate("/login");
       setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+      setAnimation({
+        type: "fadeOut",
+        callback: () => {
+          navigate("/login");
+        },
+      });
     };
 
     const welcome = (user: string) => {
@@ -48,7 +57,7 @@ const MsgContainer = () => {
       socket.off("new_message", newMessage);
       socket.off("bye", bye);
     };
-  }, []);
+  }, [handleAddMsg, navigate, setAlert, setAnimation, socket]);
 
   useEffect(() => {
     if (wrapRef.current) {
@@ -69,6 +78,7 @@ const MsgContainer = () => {
         gap: "10px",
         padding: "64px 20px 52px",
         overflow: "auto",
+        animation: animation ? animation + ".2s forwards ease-out" : "",
       }}
     >
       {msgs.map(({ type, msg, user }, i) => {

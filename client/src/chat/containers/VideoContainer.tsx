@@ -15,8 +15,12 @@ import { Button, Icon } from "@components";
 import Select from "../components/Select";
 import { alertAtom } from "@atoms/stateAtom";
 
+import { useAnimate } from "@hooks";
+
 const VideoContainer = () => {
   const navigate = useNavigate();
+
+  const [animation, setAnimation] = useAnimate();
 
   // common/AlarmContainer
   const { socket } = useOutletContext<{ socket: Socket }>();
@@ -79,12 +83,6 @@ const VideoContainer = () => {
     });
   };
 
-  // return page
-  const handleClickExit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    navigate(-1);
-  };
-
   // create stream
   const getMedia = (audio = "", video = "") => {
     const constrains = {
@@ -107,6 +105,17 @@ const VideoContainer = () => {
   const [callState, setCallState] = useState("waiting");
 
   const peerConnection = useRef<RTCPeerConnection>();
+
+  // return page
+  const handleClickExit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setAnimation({
+      type: "fadeOut",
+      callback: () => {
+        navigate(-1);
+      },
+    });
+  };
 
   useEffect(() => {
     // video init
@@ -146,7 +155,12 @@ const VideoContainer = () => {
     // connecting
     const cancelCall = () => {
       socket.emit("end_call", userInfo.name);
-      navigate(-1);
+      setAnimation({
+        type: "fadeOut",
+        callback: () => {
+          navigate(-1);
+        },
+      });
     };
 
     const permitCall = async () => {
@@ -177,7 +191,12 @@ const VideoContainer = () => {
 
     const endCall = () => {
       setAlert({ isOpened: true, type: "warning", children: "상대방이 통화를 종료하였습니다." });
-      navigate(-1);
+      setAnimation({
+        type: "fadeOut",
+        callback: () => {
+          navigate(-1);
+        },
+      });
     };
 
     // when partner reject your call
@@ -209,7 +228,7 @@ const VideoContainer = () => {
       socket.off("icecandidate", icecandidate);
       socket.off("end_call", endCall);
     };
-  }, [navigate, setAlert, name, socket, stream, userInfo.name]);
+  }, [navigate, setAlert, setAnimation, name, socket, stream, userInfo.name]);
 
   return (
     <div
@@ -221,6 +240,7 @@ const VideoContainer = () => {
         height: "100%",
         boxSizing: "border-box",
         overflow: "hidden",
+        animation: animation ? animation + ".2s forwards ease-out" : "",
       }}
     >
       <video

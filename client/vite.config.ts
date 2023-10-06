@@ -7,14 +7,16 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   resolve: {
     alias: [
-      { find: "@components", replacement: resolve(__dirname, "src/common/components") },
-      { find: "@pages", replacement: resolve(__dirname, "src/common/pages") },
-      { find: "@login", replacement: resolve(__dirname, "src/login/pages") },
-      { find: "@entry", replacement: resolve(__dirname, "src/entry/pages") },
-      { find: "@chat", replacement: resolve(__dirname, "src/chat/pages") },
-      { find: "@atoms", replacement: resolve(__dirname, "src/atoms") },
-      { find: "@utils", replacement: resolve(__dirname, "src/utils") },
       { find: "@assets", replacement: resolve(__dirname, "src/assets") },
+      { find: "@atoms", replacement: resolve(__dirname, "src/atoms") },
+      { find: "@chat", replacement: resolve(__dirname, "src/chat/pages") },
+      { find: "@components", replacement: resolve(__dirname, "src/common/components") },
+      { find: "@entry", replacement: resolve(__dirname, "src/entry/pages") },
+      { find: "@hooks", replacement: resolve(__dirname, "src/hooks") },
+      { find: "@login", replacement: resolve(__dirname, "src/login/pages") },
+
+      { find: "@pages", replacement: resolve(__dirname, "src/common/pages") },
+      { find: "@utils", replacement: resolve(__dirname, "src/utils") },
     ],
   },
   plugins: [

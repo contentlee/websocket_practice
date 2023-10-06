@@ -1,14 +1,9 @@
-import { useRecoilValue } from "recoil";
-
-import { modalAtom } from "@atoms/stateAtom";
-
 import { PageLayout } from "@components";
 
 import { CreateRoomModal, RoomListContainer } from "../containers";
 import { Title } from "../components";
 
 const EntryPage = () => {
-  const modal = useRecoilValue(modalAtom);
   return (
     <PageLayout
       css={{

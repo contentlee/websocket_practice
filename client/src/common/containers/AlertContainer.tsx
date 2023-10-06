@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRecoilState } from "recoil";
-import { keyframes } from "@emotion/react";
 
 import SucessIcon from "@assets/success_icon.svg";
 import ErrorIcon from "@assets/error_icon.svg";
@@ -9,30 +8,15 @@ import WarningIcon from "@assets/warning_icon.svg";
 import CloseIcon from "@assets/close_icon.svg";
 
 import { alertAtom, closeAlertAction } from "@atoms/stateAtom";
+
+import { useAnimate } from "@hooks";
+
 import Alert from "../components/Alert";
 import Icon from "../components/Icon";
 
-const animate = keyframes`
-  0%{
-    opacity: 0;
-    transform: translateY(-10px)
-  }
-  5%{
-    opacity: 1;
-    transform: translateY(0)
-  }
-  95%{
-    opacity: 1;
-    transform: translateY(0)
-  }
-  100%{
-    opacity: 0;
-    transform: translateY(-10px)
-  }
-
-`;
-
 const AlertContainer = () => {
+  const [animation, setAnimation] = useAnimate();
+
   const [alert, setAlert] = useRecoilState(alertAtom);
 
   const { type, children } = alert;
@@ -41,6 +25,10 @@ const AlertContainer = () => {
     e.preventDefault();
     setAlert(closeAlertAction);
   };
+
+  useEffect(() => {
+    setAnimation({ type: "alert", time: 5000, callback: () => {} });
+  }, [setAnimation]);
 
   useEffect(() => {
     if (alert.isOpened) {
@@ -62,7 +50,7 @@ const AlertContainer = () => {
           display: "flex",
           justifyContent: "center",
           width: "100%",
-          animation: `${animate} 4.8s ease-in forwards`,
+          animation: `${animation} 4.8s ease-in forwards`,
         }}
       >
         <Alert type={type}>
