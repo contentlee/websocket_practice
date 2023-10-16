@@ -4,6 +4,7 @@
 
 가볍게 사용할 수 있는 채팅앱입니다. Socket.io와 WebRTC 학습을 위해 진행 중인 프로젝트입니다.
 
+![img](https://i.ibb.co/6ymYVfK/socket-practice.png)
 ## Enviroment
 
 - Node.js 18.12.1
