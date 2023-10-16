@@ -99,5 +99,9 @@ src
 
 ## Next Progress
 
-- 기능 추가
-    - ~~1:1 통화와 1:1 영상통화 기능 추가 (WebRTC)~~
+- 특정 요청을 http 로 변경하여 효율적으로 서버 요청하도록 리팩토링
+- 통화 종료의 여러 방식에 대한 대응 구현
+
+## About this project
+
+[방심했던 socket.io 연결](https://industrious-backbone-3d5.notion.site/socket-io-05d6d662b9424aae8d14fb9074825d1d?pvs=4)
