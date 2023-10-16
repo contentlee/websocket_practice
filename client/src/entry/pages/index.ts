@@ -1,3 +1,3 @@
-import EntryPage from "./EntryPage";
+import EntryPage from './EntryPage';
 
 export { EntryPage };

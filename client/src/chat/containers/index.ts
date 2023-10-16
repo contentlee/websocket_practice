@@ -1,8 +1,6 @@
-import CallContainer from "./CallContainer";
-import MsgContainer from "./MsgContainer";
-import SendForm from "./SendForm";
-import TitleContainer from "./TitleContainer";
-import UserListModal from "./UserListModal";
-import VideoContainer from "./VideoContainer";
+import MsgContainer from './MsgContainer';
+import SendForm from './SendForm';
+import TitleContainer from './TitleContainer';
+import UserListModal from './UserListModal';
 
-export { CallContainer, MsgContainer, SendForm, TitleContainer, UserListModal, VideoContainer };
+export { MsgContainer, SendForm, TitleContainer, UserListModal };

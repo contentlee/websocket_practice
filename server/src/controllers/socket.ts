@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { SocketService } from "../services";
 import { BaseRoom, RoomInfo } from "../utils/types";
+import { clients } from "../utils/context";
 
 class SocketController {
   service = new SocketService();
@@ -17,6 +18,8 @@ class SocketController {
   }
 
   public login = (userName: string, done: () => void) => {
+    if (!userName) return this.socket.emit("need_login");
+
     const userIndex = this.service.getUserIndex(userName);
     if (userIndex >= 0) this.service.refresh(userIndex, this.socket.id);
     else this.service.login(userName, this.socket.id);
@@ -107,7 +110,6 @@ class SocketController {
     }
   };
 
-  /// for call
   public requireCall = (toUserName: string, fromUserName: string, done: () => void) => {
     const userInfo = this.service.findUserId(toUserName);
     if (userInfo) {
@@ -117,36 +119,6 @@ class SocketController {
     } else {
       this.socket.emit("not_found_user");
     }
-  };
-
-  public permitCall = (fromUserName: string, done: () => void) => {
-    this.socket.join(fromUserName);
-    this.socket.to(fromUserName).emit("permit_call");
-    done();
-  };
-
-  public offer = (roomName: string, offer: RTCSessionDescriptionInit, done: () => void) => {
-    this.socket.to(roomName).emit("offer", offer);
-    done();
-  };
-
-  public answer = (roomName: string, answer: RTCSessionDescriptionInit, done: () => void) => {
-    this.socket.to(roomName).emit("answer", answer);
-    done();
-  };
-
-  public icecandidate = (roomName: string, ice: RTCPeerConnectionIceEvent) => {
-    this.socket.to(roomName).emit("icecandidate", ice);
-  };
-
-  public cancelCall = (fromUserName: string, done: () => void) => {
-    this.socket.to(fromUserName).emit("cancel_call");
-    done();
-  };
-
-  public endCall = (fromUserName: string) => {
-    this.socket.leave(fromUserName);
-    this.socket.to(fromUserName).emit("end_call");
   };
 
   public requireVideoCall = (toUserName: string, fromUserName: string, done: () => void) => {
@@ -160,19 +132,41 @@ class SocketController {
     }
   };
 
-  public permitVideoCall = (fromUserName: string, done: () => void) => {
+
+  public permitCall = (fromUserName: string, done: () => void) => {
     this.socket.join(fromUserName);
-    this.socket.to(fromUserName).emit("permit_video_call");
+    this.socket.to(fromUserName).emit("permit_call");
     done();
   };
 
-  public cancelVideoCall = (fromUserName: string) => {
-    this.socket.to(fromUserName).emit("cancel_video_call");
+  public offer = (roomName: string, offer: RTCSessionDescriptionInit, done: () => void) => {
+    this.socket.to(roomName).emit("offer", offer);
+    done();
   };
 
-  public endVideoCall = (fromUserName: string) => {
+  public answer = (fromName: string, answer: RTCSessionDescriptionInit, done: () => void) => {
+    const userInfo = this.service.findUserId(fromName);
+    if (userInfo) {
+      this.socket.to(userInfo.id).emit("answer", answer);
+      done();
+    } else {
+      this.socket.emit("exit_from_user");
+    }
+  };
+
+  public icecandidate = (roomName: string, ice: RTCPeerConnectionIceEvent) => {
+    this.socket.to(roomName).emit("icecandidate", ice);
+  };
+
+  public cancelCall = (fromUserName: string, done: () => void) => {
+    this.socket.to(fromUserName).emit("cancel_call");
+    done();
+  };
+
+  public endCall = (fromUserName: string, done: () => void) => {
     this.socket.leave(fromUserName);
-    this.socket.to(fromUserName).emit("end_video_call");
+    this.socket.to(fromUserName).emit("end_call");
+    done();
   };
 
   public disconnecting = () => {

@@ -1,19 +1,61 @@
 module.exports = {
   root: true,
   env: { browser: true, es2020: true },
-  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:react-hooks/recommended"],
-  ignorePatterns: ["dist", ".eslintrc.cjs"],
-  parser: "@typescript-eslint/parser",
-  plugins: ["react-refresh"],
+  extends: [
+    'plugin:react-hooks/recommended',
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'plugin:prettier/recommended',
+    'plugin:import/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'plugin:import/typescript',
+  ],
+  plugins: ['react', 'react-refresh', 'import'],
+  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    tsconfigRootDir: './',
+  },
   rules: {
-    "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-    "@typescript-eslint/no-unused-vars": [
-      "warn", // or "error"
+    'import/order': [
+      'error',
       {
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^_",
-        caughtErrorsIgnorePattern: "^_",
+        groups: ['builtin', 'external', 'object', 'internal', 'parent', 'sibling', 'type'],
+        pathGroups: [
+          { pattern: 'react', group: 'builtin', position: 'before' },
+          { pattern: 'react-dom', group: 'builtin', position: 'before' },
+          { pattern: 'react-router', group: 'builtin', position: 'before' },
+          { pattern: 'react-router-dom', group: 'builtin', position: 'before' },
+          { pattern: 'recoil', group: 'external', position: 'before' },
+          { pattern: 'immer', group: 'external', position: 'before' },
+          { pattern: 'socket.io-client', group: 'external', position: 'before' },
+          { pattern: '@asset/**', group: 'object', position: 'before' },
+          { pattern: '@atoms/**', group: 'internal' },
+          { pattern: '@utils/**', group: 'internal' },
+          { pattern: '@hooks', group: 'internal' },
+          { pattern: '@pages', group: 'internal' },
+          { pattern: '@entry', group: 'internal' },
+          { pattern: '@login', group: 'internal' },
+          { pattern: '@chat', group: 'internal' },
+          { pattern: '@call', group: 'internal' },
+          { pattern: '@components', group: 'internal' },
+          { pattern: '../helpers/*', group: 'parent', position: 'before' },
+          { pattern: '../contexts', group: 'parent', position: 'before' },
+          { pattern: '../containers', group: 'parent', position: 'before' },
+          { pattern: '../components', group: 'parent', position: 'before' },
+        ],
+        'newlines-between': 'always',
       },
     ],
+  },
+  settings: {
+    'import/resolver': {
+      typescript: {},
+    },
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
   },
 };

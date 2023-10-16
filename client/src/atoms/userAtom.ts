@@ -1,12 +1,12 @@
-import { atom } from "recoil";
+import { atom } from 'recoil';
 
 interface User {
   name: string;
 }
 /// 이후 추가될 부분을 위해 객체로 남겨둠
 export const userAtom = atom<User>({
-  key: "userAtom",
+  key: 'userAtom',
   default: {
-    name: "",
+    name: '',
   },
 });

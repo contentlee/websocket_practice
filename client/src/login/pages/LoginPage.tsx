@@ -1,14 +1,14 @@
-import { PageLayout } from "@components";
+import { PageLayout } from '@components';
 
-import { LoginContainer } from "../containers";
+import { LoginContainer } from '../containers';
 
 const LoginPage = () => {
   return (
     <PageLayout
       css={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
       <LoginContainer></LoginContainer>

@@ -1,14 +1,13 @@
-import { useContext, useEffect, useRef } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import { Socket } from "socket.io-client/debug";
+import { useContext, useEffect, useRef } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
+import { Socket } from 'socket.io-client/debug';
 
-import { alertAtom } from "@atoms/stateAtom";
+import { alertAtom } from '@atoms/stateAtom';
+import { useAnimate } from '@hooks';
 
-import { EnterMsg, FromMsg, ToMsg } from "../components";
-
-import { HandlerContext, MsgContext } from "../contexts/ChatContext";
-import { useAnimate } from "@hooks";
+import { EnterMsg, FromMsg, ToMsg } from '../components';
+import { HandlerContext, MsgContext } from '../contexts/ChatContext';
 
 const MsgContainer = () => {
   const navigate = useNavigate();
@@ -25,37 +24,51 @@ const MsgContainer = () => {
 
   useEffect(() => {
     const needLogin = () => {
-      setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+      setAlert({
+        isOpened: true,
+        type: 'error',
+        children: '로그인이 필요합니다.',
+      });
       setAnimation({
-        type: "fadeOut",
+        type: 'fadeOut',
         callback: () => {
-          navigate("/login");
+          navigate('/login');
         },
       });
     };
 
     const welcome = (user: string) => {
-      handleAddMsg({ type: "welcome", user, msg: `${user} 님이 참여하셨습니다.`, date: new Date() });
+      handleAddMsg({
+        type: 'welcome',
+        user,
+        msg: `${user} 님이 참여하셨습니다.`,
+        date: new Date(),
+      });
     };
 
     const newMessage = (user: string, msg: string) => {
-      handleAddMsg({ type: "to", user, msg, date: new Date() });
+      handleAddMsg({ type: 'to', user, msg, date: new Date() });
     };
 
     const bye = (user: string) => {
-      handleAddMsg({ type: "bye", user, msg: `${user} 님이 퇴장하셨습니다.`, date: new Date() });
+      handleAddMsg({
+        type: 'bye',
+        user,
+        msg: `${user} 님이 퇴장하셨습니다.`,
+        date: new Date(),
+      });
     };
 
-    socket.on("need_login", needLogin);
-    socket.on("welcome", welcome);
-    socket.on("new_message", newMessage);
-    socket.on("bye", bye);
+    socket.on('need_login', needLogin);
+    socket.on('welcome', welcome);
+    socket.on('new_message', newMessage);
+    socket.on('bye', bye);
 
     return () => {
-      socket.off("need_login", needLogin);
-      socket.off("welcome", welcome);
-      socket.off("new_message", newMessage);
-      socket.off("bye", bye);
+      socket.off('need_login', needLogin);
+      socket.off('welcome', welcome);
+      socket.off('new_message', newMessage);
+      socket.off('bye', bye);
     };
   }, [handleAddMsg, navigate, setAlert, setAnimation, socket]);
 
@@ -73,18 +86,18 @@ const MsgContainer = () => {
     <div
       ref={wrapRef}
       css={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-        padding: "64px 20px 52px",
-        overflow: "auto",
-        animation: animation ? animation + ".2s forwards ease-out" : "",
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        padding: '64px 20px 52px',
+        overflow: 'auto',
+        animation: animation ? animation + '.2s forwards ease-out' : '',
       }}
     >
       {msgs.map(({ type, msg, user }, i) => {
-        if (type === "from") return <FromMsg msg={msg} key={i} />;
-        if (type === "welcome") return <EnterMsg name={user} msg={msg} key={i} />;
-        if (type === "bye") return <EnterMsg name={user} msg={msg} key={i} />;
+        if (type === 'from') return <FromMsg msg={msg} key={i} />;
+        if (type === 'welcome') return <EnterMsg msg={msg} key={i} />;
+        if (type === 'bye') return <EnterMsg msg={msg} key={i} />;
         return <ToMsg name={user} msg={msg} key={i} />;
       })}
     </div>

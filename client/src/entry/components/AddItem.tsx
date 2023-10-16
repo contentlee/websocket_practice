@@ -1,9 +1,9 @@
-import { HTMLAttributes } from "react";
+import { HTMLAttributes } from 'react';
 
-import AddIcon from "@assets/add_circle_icon.svg";
+import AddIcon from '@assets/add_circle_icon.svg';
 
-import { Icon } from "@components";
-import { palette } from "@utils/palette";
+import { palette } from '@utils/palette';
+import { Icon } from '@components';
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 
@@ -11,29 +11,29 @@ const AddItem = ({ ...props }: Props) => {
   return (
     <div
       css={{
-        display: "flex",
-        alignItems: "center",
-        gap: "10px",
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
       }}
       {...props}
     >
       <hr
         css={{
-          display: "flex",
-          flex: "auto",
-          height: "0.5px",
+          display: 'flex',
+          flex: 'auto',
+          height: '0.5px',
           background: palette.gray.gray83,
-          border: "none",
+          border: 'none',
         }}
       />
       <Icon src={AddIcon}></Icon>
       <hr
         css={{
-          display: "flex",
-          flex: "auto",
-          height: "0.5px",
+          display: 'flex',
+          flex: 'auto',
+          height: '0.5px',
           background: palette.gray.gray83,
-          border: "none",
+          border: 'none',
         }}
       />
     </div>

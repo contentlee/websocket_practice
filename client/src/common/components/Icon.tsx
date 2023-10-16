@@ -1,33 +1,33 @@
-import { ImgHTMLAttributes } from "react";
+import { ImgHTMLAttributes } from 'react';
 
 interface Props extends ImgHTMLAttributes<HTMLImageElement> {
   src: string;
-  size?: "small" | "medium" | "large" | "logo_a" | "logo_b" | "logo_c" | "add";
+  size?: 'small' | 'medium' | 'large' | 'logo_a' | 'logo_b' | 'logo_c' | 'add';
 }
 
-const Icon = ({ src, size = "medium", ...props }: Props) => {
+const Icon = ({ src, size = 'medium', ...props }: Props) => {
   return (
     <div
       css={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
 
-        cursor: "pointer",
-        userSelect: "none",
+        cursor: 'pointer',
+        userSelect: 'none',
 
-        transition: "0.2s",
+        transition: '0.2s',
 
         ...SIZE_VARIANTS[size],
 
-        "&:hover": {
-          filter: "contrast(80%)",
+        '&:hover': {
+          filter: 'contrast(80%)',
         },
       }}
     >
       <img
         css={{
-          width: "100%",
+          width: '100%',
         }}
         src={src}
         {...props}
@@ -38,26 +38,26 @@ const Icon = ({ src, size = "medium", ...props }: Props) => {
 
 const SIZE_VARIANTS = {
   small: {
-    width: "18px",
+    width: '18px',
   },
   medium: {
-    width: "24px",
+    width: '24px',
   },
   large: {
-    width: "36px",
+    width: '36px',
   },
   add: {
-    width: "64px",
+    width: '64px',
   },
   logo_a: {
-    width: "100%",
-    maxWidth: "290px",
+    width: '100%',
+    maxWidth: '290px',
   },
   logo_b: {
-    width: "160px",
+    width: '160px',
   },
   logo_c: {
-    width: "80px",
+    width: '80px',
   },
 };
 export default Icon;

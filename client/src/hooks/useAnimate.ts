@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
-import { keyframes, Keyframes } from "@emotion/react";
+import { keyframes, Keyframes } from '@emotion/react';
 
 export interface Animation {
-  type: "fadeIn" | "fadeOut" | "alert" | "showAlarm" | "closeAlarm";
+  type: 'fadeIn' | 'fadeOut' | 'alert' | 'showAlarm' | 'closeAlarm';
   callback?: () => void;
   time?: number;
 }
@@ -18,7 +18,7 @@ const useAnimate = (): Return => {
         () => {
           if (animation.callback) animation.callback();
         },
-        animation.time ? animation.time : 300
+        animation.time ? animation.time : 300,
       );
 
       return () => {
@@ -84,7 +84,7 @@ const ANIMATE_TYPE = {
   transform: translateY(0px);
 }
 100% {
-  opacity: 1;
+  opacity: 0;
   transform: translateY(-50px);
 }
 `,

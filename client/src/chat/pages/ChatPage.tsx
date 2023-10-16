@@ -1,11 +1,19 @@
-import { PageLayout } from "@components";
+import { PageLayout } from '@components';
 
-import { MsgContainer, SendForm, TitleContainer, UserListModal } from "../containers";
-import { ChatContext } from "../contexts";
+import { ChatContext } from '../contexts';
+import { MsgContainer, SendForm, TitleContainer, UserListModal } from '../containers';
 
 const ChatPage = () => {
   return (
-    <PageLayout css={{ display: "flex", flexDirection: "column", gap: "20px", padding: 0, overflow: "hidden" }}>
+    <PageLayout
+      css={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        padding: 0,
+        overflow: 'hidden',
+      }}
+    >
       <ChatContext>
         <TitleContainer />
         <MsgContainer></MsgContainer>

@@ -1,5 +1,6 @@
-import { palette } from "@utils/palette";
-import { HTMLAttributes } from "react";
+import { HTMLAttributes } from 'react';
+
+import { palette } from '@utils/palette';
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   msg: string;
@@ -9,17 +10,17 @@ const FromMsg = ({ msg, ...props }: Props) => {
   return (
     <div
       css={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-end",
-        gap: "10px",
-        width: "100%",
-        minHeight: "42px",
-        padding: "5px 10px",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '10px',
+        width: '100%',
+        minHeight: '42px',
+        padding: '5px 10px',
         border: `1.5px solid ${palette.gray.gray83}`,
-        boxSizing: "border-box",
+        boxSizing: 'border-box',
         background: palette.background,
-        fontSize: "14px",
+        fontSize: '14px',
         color: palette.main.blk,
       }}
       {...props}

@@ -1,18 +1,18 @@
-import { produce } from "immer";
-import { atom } from "recoil";
+import { produce } from 'immer';
+import { atom } from 'recoil';
 
 interface Alert {
   isOpened: boolean;
-  type: "success" | "error" | "warning";
+  type: 'success' | 'error' | 'warning';
   children: React.ReactNode;
 }
 
 export const alertAtom = atom<Alert>({
-  key: "alertAtom",
+  key: 'alertAtom',
   default: {
     isOpened: false,
-    type: "success",
-    children: "",
+    type: 'success',
+    children: '',
   },
 });
 
@@ -24,14 +24,14 @@ export const closeAlertAction = (prev: Alert) =>
 
 interface Modal {
   isOpened: boolean;
-  type: "create" | "attendeeList";
+  type: 'create' | 'attendeeList';
 }
 
 export const modalAtom = atom<Modal>({
-  key: "modalAtom",
+  key: 'modalAtom',
   default: {
     isOpened: false,
-    type: "create",
+    type: 'create',
   },
 });
 
@@ -43,13 +43,13 @@ export const closeModalAction = (prev: Modal) =>
 
 interface Alarm {
   isOpened: boolean;
-  type: "call" | "video";
+  type: 'call' | 'video';
 }
 
 export const alarmAtom = atom<Alarm>({
-  key: "alarmAtom",
+  key: 'alarmAtom',
   default: {
     isOpened: false,
-    type: "call",
+    type: 'call',
   },
 });

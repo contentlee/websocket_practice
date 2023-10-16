@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { useOutletContext } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { Socket } from "socket.io-client";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { useOutletContext } from 'react-router-dom';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { Socket } from 'socket.io-client';
 
-import { alertAtom, modalAtom } from "@atoms/stateAtom";
+import { alertAtom, modalAtom } from '@atoms/stateAtom';
+import { userAtom } from '@atoms/userAtom';
+import { useAnimate } from '@hooks';
 
-import { AddItem, RoomItem } from "../components";
-
-import { EmptyListContainer } from ".";
-import { userAtom } from "@atoms/userAtom";
-import { useAnimate } from "@hooks";
+import { AddItem, RoomItem } from '../components';
+import { EmptyListContainer } from '.';
 
 interface Room {
   name: string;
@@ -33,17 +32,17 @@ const RoomListContainer = () => {
 
   const handleClickRoom = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
-    if (userInfo.name === "") {
+    if (userInfo.name === '') {
       setAnimation({
-        type: "fadeOut",
+        type: 'fadeOut',
         callback: () => {
-          navigate("/login");
+          navigate('/login');
         },
       });
     } else {
-      socket.emit("enter_room", name, userInfo.name, () => {
+      socket.emit('enter_room', name, userInfo.name, () => {
         setAnimation({
-          type: "fadeOut",
+          type: 'fadeOut',
           callback: () => {
             navigate(`/chat/${name}`);
           },
@@ -54,20 +53,20 @@ const RoomListContainer = () => {
 
   const handleClickCreate = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (userInfo.name === "") {
+    if (userInfo.name === '') {
       setAnimation({
-        type: "fadeOut",
+        type: 'fadeOut',
         callback: () => {
-          navigate("/login");
+          navigate('/login');
         },
       });
     } else {
-      setModal({ isOpened: true, type: "create" });
+      setModal({ isOpened: true, type: 'create' });
     }
   };
 
   useEffect(() => {
-    socket.emit("get_rooms", userInfo.name, (roomList: Room[]) => {
+    socket.emit('get_rooms', userInfo.name, (roomList: Room[]) => {
       setRooms(roomList);
     });
 
@@ -76,20 +75,24 @@ const RoomListContainer = () => {
     };
     const needLogin = () => {
       setAnimation({
-        type: "fadeOut",
+        type: 'fadeOut',
         callback: () => {
-          navigate("/login");
-          setAlert({ isOpened: true, type: "error", children: "로그인이 필요합니다." });
+          navigate('/login');
+          setAlert({
+            isOpened: true,
+            type: 'error',
+            children: '로그인이 필요합니다.',
+          });
         },
       });
     };
 
-    socket.on("change_rooms", changeRoom);
-    socket.on("need_login", needLogin);
+    socket.on('change_rooms', changeRoom);
+    socket.on('need_login', needLogin);
 
     return () => {
-      socket.off("change_rooms", changeRoom);
-      socket.off("need_login", needLogin);
+      socket.off('change_rooms', changeRoom);
+      socket.off('need_login', needLogin);
     };
   }, [navigate, setAlert, setAnimation, socket, userInfo.name]);
 
@@ -97,10 +100,10 @@ const RoomListContainer = () => {
     return (
       <div
         css={{
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
-          gap: "10px",
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          gap: '10px',
         }}
       >
         <EmptyListContainer></EmptyListContainer>
@@ -110,11 +113,11 @@ const RoomListContainer = () => {
   return (
     <div
       css={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        gap: "10px",
-        animation: animation ? animation + ".2s forwards ease-out" : "",
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        gap: '10px',
+        animation: animation ? animation + '.2s forwards ease-out' : '',
       }}
     >
       {rooms.map(({ name, attendee, max_length }) => {

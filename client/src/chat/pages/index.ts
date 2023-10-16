@@ -1,5 +1,3 @@
-import CallPage from "./CallPage";
-import ChatPage from "./ChatPage";
-import VideoPage from "./VideoPage";
+import ChatPage from './ChatPage';
 
-export { CallPage, ChatPage, VideoPage };
+export { ChatPage };

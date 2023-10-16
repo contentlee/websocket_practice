@@ -1,18 +1,17 @@
-import { useEffect } from "react";
-import { createPortal } from "react-dom";
-import { useRecoilState } from "recoil";
+import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { useRecoilState } from 'recoil';
 
-import SucessIcon from "@assets/success_icon.svg";
-import ErrorIcon from "@assets/error_icon.svg";
-import WarningIcon from "@assets/warning_icon.svg";
-import CloseIcon from "@assets/close_icon.svg";
+import SucessIcon from '@assets/success_icon.svg';
+import ErrorIcon from '@assets/error_icon.svg';
+import WarningIcon from '@assets/warning_icon.svg';
+import CloseIcon from '@assets/close_icon.svg';
 
-import { alertAtom, closeAlertAction } from "@atoms/stateAtom";
+import { alertAtom, closeAlertAction } from '@atoms/stateAtom';
+import { useAnimate } from '@hooks';
 
-import { useAnimate } from "@hooks";
-
-import Alert from "../components/Alert";
-import Icon from "../components/Icon";
+import Alert from '../components/Alert';
+import Icon from '../components/Icon';
 
 const AlertContainer = () => {
   const [animation, setAnimation] = useAnimate();
@@ -27,7 +26,7 @@ const AlertContainer = () => {
   };
 
   useEffect(() => {
-    setAnimation({ type: "alert", time: 5000, callback: () => {} });
+    setAnimation({ type: 'alert', time: 5000, callback: () => {} });
   }, [setAnimation]);
 
   useEffect(() => {
@@ -44,25 +43,25 @@ const AlertContainer = () => {
     createPortal(
       <div
         css={{
-          zIndex: "1000",
-          position: "absolute",
-          top: "20px",
-          display: "flex",
-          justifyContent: "center",
-          width: "100%",
+          zIndex: '1000',
+          position: 'absolute',
+          top: '20px',
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
           animation: `${animation} 4.8s ease-in forwards`,
         }}
       >
         <Alert type={type}>
-          {type === "success" && <Icon src={SucessIcon}></Icon>}
-          {type === "error" && <Icon src={ErrorIcon}></Icon>}
-          {type === "warning" && <Icon src={WarningIcon}></Icon>}
+          {type === 'success' && <Icon src={SucessIcon}></Icon>}
+          {type === 'error' && <Icon src={ErrorIcon}></Icon>}
+          {type === 'warning' && <Icon src={WarningIcon}></Icon>}
 
           {children}
           <div
             css={{
-              position: "absolute",
-              right: "14px",
+              position: 'absolute',
+              right: '14px',
             }}
           >
             <Icon src={CloseIcon} onClick={handleClickClose}></Icon>
@@ -70,7 +69,7 @@ const AlertContainer = () => {
         </Alert>
       </div>,
       document.body,
-      "alert"
+      'alert',
     )
   );
 };

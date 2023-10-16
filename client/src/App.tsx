@@ -1,13 +1,13 @@
-import { Navigate, Routes } from "react-router";
-import { Route } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { Navigate, Routes } from 'react-router';
+import { Route } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 
-import { LoginPage } from "@login";
-import { CommonPage } from "@pages";
-import { EntryPage } from "@entry";
-import { CallPage, ChatPage, VideoPage } from "@chat";
-
-import { userAtom } from "@atoms/userAtom";
+import { LoginPage } from '@login';
+import { CommonPage } from '@pages';
+import { EntryPage } from '@entry';
+import { ChatPage } from '@chat';
+import { CallPage, VideoPage } from '@call';
+import { userAtom } from '@atoms/userAtom';
 
 function App() {
   const userInfo = useRecoilValue(userAtom);

@@ -1,3 +1,3 @@
-import CommonPage from "./CommonPage";
+import CommonPage from './CommonPage';
 
 export { CommonPage };
