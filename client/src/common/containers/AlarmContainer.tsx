@@ -30,7 +30,6 @@ const AlarmContainer = ({ socket }: Props) => {
 
   const handleClickPermit = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate(`/${alarm.type}/${name}`);
 
     setAnimation({
       type: 'closeAlarm',
@@ -43,6 +42,7 @@ const AlarmContainer = ({ socket }: Props) => {
           }),
         );
         setAnimation({ type: 'showAlarm', time: 600, callback: () => {} });
+        navigate(`/${alarm.type}/${name}`);
       },
     });
   };

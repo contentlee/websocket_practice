@@ -64,6 +64,12 @@ const VideoContainer = () => {
       ?.getSenders()
       .find((sender) => sender.track?.kind === 'audio');
     await audioSender?.replaceTrack(mediaStream.getTracks()[0]);
+
+    if (!onAudio)
+      mediaStream.getAudioTracks().forEach((track) => {
+        track.enabled = !track.enabled;
+      });
+
     stream.current = mediaStream;
   };
 
@@ -94,6 +100,17 @@ const VideoContainer = () => {
       ?.getSenders()
       .find((sender) => sender.track?.kind === 'video');
     await videoSender?.replaceTrack(mediaStream.getVideoTracks()[0]);
+
+    if (!onVideo)
+      mediaStream.getVideoTracks().forEach((track) => {
+        track.enabled = !track.enabled;
+      });
+
+    if (!onAudio)
+      mediaStream.getAudioTracks().forEach((track) => {
+        track.enabled = !track.enabled;
+      });
+
     stream.current = mediaStream;
   };
 

@@ -56,6 +56,12 @@ const CallContainer = () => {
       .find((sender) => sender.track?.kind === 'audio');
 
     await audioSender?.replaceTrack(mediaStream.getTracks()[0]);
+
+    if (!onAudio)
+      mediaStream.getAudioTracks().forEach((track) => {
+        track.enabled = !track.enabled;
+      });
+
     stream.current = mediaStream;
   };
 
