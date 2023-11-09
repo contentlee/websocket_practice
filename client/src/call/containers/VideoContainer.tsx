@@ -190,6 +190,7 @@ const VideoContainer = () => {
       try {
         await peerConnection.current?.setRemoteDescription(answer);
         setCallState('connect');
+        console.log(callState);
       } catch (err) {
         console.log(err);
       }

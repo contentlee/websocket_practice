@@ -29,7 +29,7 @@ export const MsgContext = createContext<Msg[]>([]);
 export const AttendeeContext = createContext<Room['attendee']>([]);
 
 export const HandlerContext = createContext({
-  handleAddMsg: (msg: Msg) => {},
+  handleAddMsg: (_: Msg) => {},
 });
 
 const ChatContext = ({ children }: { children: React.ReactNode }) => {

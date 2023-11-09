@@ -82,6 +82,11 @@ const AlarmContainer = ({ socket }: Props) => {
 
     socket.on('require_call', requireCall);
     socket.on('require_video_call', requireVideoCall);
+
+    return () => {
+      socket.off('require_call', requireCall);
+      socket.off('require_video_call', requireVideoCall);
+    };
   }, [setAlarm, socket]);
 
   return (

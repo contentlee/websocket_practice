@@ -55,7 +55,7 @@ const ConnectionContext = ({ children }: { children: React.ReactNode }) => {
         const audioDevices = await getDevices('audioinput');
         const videoDevices = await getDevices('videoinput');
 
-        navigator.mediaDevices.addEventListener('devicechange', async (e) => {
+        navigator.mediaDevices.addEventListener('devicechange', async () => {
           try {
             const audioDevices = await getDevices('audioinput');
             const videoDevices = await getDevices('videoinput');

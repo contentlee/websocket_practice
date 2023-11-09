@@ -150,6 +150,11 @@ const CallContainer = () => {
 
     const cancelCall = () => {
       socket.emit('end_call', name, () => {
+        setAlert({
+          isOpened: true,
+          type: 'warning',
+          children: '상대방이 통화를 거부하였습니다.',
+        });
         setAnimation({
           type: 'fadeOut',
           callback: () => {
