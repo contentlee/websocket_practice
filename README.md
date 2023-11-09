@@ -58,16 +58,16 @@ $ yarn start
 
 - Main Design Pattern : Container-Presenter Pattern
 - Folder Description
-    - 비지니스 로직을 중심으로, 페이지별 폴더 구조를 잡았습니다.
-    - assets : 아이콘, 이미지 등과 같은 정적 파일을 담고 있습니다.
-    - atoms : recoil을 통해 전역변수를 관리합니다. (현재 UI 상태값과 사용자 정보만을 관리하고 있습니다.)
-    - chat : 채팅의 핵심적인 기능들인 메세지를 보내고 받는 기능을 담당하는 폴더입니다.
-    - common : 모든 페이지들에서 공통적으로 사용될 수 있는 요소들을 담았습니다.
-    - entry : 채팅방 리스트를 보고, 선택하거나 만들 수 있는 기능을 담당하고 있는 폴더입니다.
-    - login : 사용자가 서비스에 입장할 수 있도록 도와주는 폴더입니다.
-    - utils : 색상 관리 유틸을 담고 있습니다.
-    - App.tsx : 현재 React Router를 통해 SPA Routing을 관리합니다.
-    - main.tsx : 앱 사용을 위한 모든 Provider를 설정합니다.
+  - 비지니스 로직을 중심으로, 페이지별 폴더 구조를 잡았습니다.
+  - assets : 아이콘, 이미지 등과 같은 정적 파일을 담고 있습니다.
+  - atoms : recoil을 통해 전역변수를 관리합니다. (현재 UI 상태값과 사용자 정보만을 관리하고 있습니다.)
+  - chat : 채팅의 핵심적인 기능들인 메세지를 보내고 받는 기능을 담당하는 폴더입니다.
+  - common : 모든 페이지들에서 공통적으로 사용될 수 있는 요소들을 담았습니다.
+  - entry : 채팅방 리스트를 보고, 선택하거나 만들 수 있는 기능을 담당하고 있는 폴더입니다.
+  - login : 사용자가 서비스에 입장할 수 있도록 도와주는 폴더입니다.
+  - utils : 색상 관리 유틸을 담고 있습니다.
+  - App.tsx : 현재 React Router를 통해 SPA Routing을 관리합니다.
+  - main.tsx : 앱 사용을 위한 모든 Provider를 설정합니다.
 
 ```jsx
 src
@@ -107,5 +107,5 @@ src
 
 ## About this project
 
-[방심했던 socket.io 연결](https://industrious-backbone-3d5.notion.site/socket-io-05d6d662b9424aae8d14fb9074825d1d?pvs=4)
-[사용자 간의 자연스러운 연결을 위해](https://industrious-backbone-3d5.notion.site/7e1201408d9e47b683b5180e1ab3c096?pvs=4)
+- [방심했던 socket.io 연결](https://industrious-backbone-3d5.notion.site/socket-io-05d6d662b9424aae8d14fb9074825d1d?pvs=4)
+- [사용자 간의 자연스러운 연결을 위해](https://industrious-backbone-3d5.notion.site/7e1201408d9e47b683b5180e1ab3c096?pvs=4)
