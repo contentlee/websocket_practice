@@ -107,5 +107,7 @@ src
 
 ## About this project
 
-- [방심했던 socket.io 연결](https://industrious-backbone-3d5.notion.site/socket-io-05d6d662b9424aae8d14fb9074825d1d?pvs=4)
+- [폴더 구조에 관하여](https://industrious-backbone-3d5.notion.site/bdf3b2f412cc4cb59f3e86f56898f738?pvs=4)
 - [사용자 간의 자연스러운 연결을 위해](https://industrious-backbone-3d5.notion.site/7e1201408d9e47b683b5180e1ab3c096?pvs=4)
+- [방심했던 socket.io 연결](https://industrious-backbone-3d5.notion.site/socket-io-05d6d662b9424aae8d14fb9074825d1d?pvs=4)
+- [useAnimate 구현](https://industrious-backbone-3d5.notion.site/useAnimate-f1325ec0a53d41a1bda64121e3f1e5b3?pvs=4)
