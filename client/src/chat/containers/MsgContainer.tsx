@@ -1,10 +1,8 @@
 import { useContext, useEffect, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
 import { Socket } from 'socket.io-client/debug';
 
-import { alertAtom } from '@atoms/stateAtom';
-import { useAnimate } from '@hooks';
+import { useAlert, useAnimate } from '@hooks';
 
 import { EnterMsg, FromMsg, ToMsg } from '../components';
 import { HandlerContext, MsgContext } from '../contexts/ChatContext';
@@ -13,6 +11,7 @@ const MsgContainer = () => {
   const navigate = useNavigate();
 
   const [animation, setAnimation] = useAnimate();
+  const [_, setAlert] = useAlert();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
@@ -20,21 +19,11 @@ const MsgContainer = () => {
 
   const msgs = useContext(MsgContext);
   const { handleAddMsg } = useContext(HandlerContext);
-  const [_, setAlert] = useRecoilState(alertAtom);
 
   useEffect(() => {
     const needLogin = () => {
-      setAlert({
-        isOpened: true,
-        type: 'error',
-        children: '로그인이 필요합니다.',
-      });
-      setAnimation({
-        type: 'fadeOut',
-        callback: () => {
-          navigate('/login');
-        },
-      });
+      setAlert('error', '로그인이 필요합니다.');
+      setAnimation('fadeOut', () => navigate('/login'));
     };
 
     const welcome = (user: string) => {

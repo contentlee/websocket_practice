@@ -47,20 +47,18 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
   const handleAddMsg = (msg: Msg) => setMsgs([...msgs, msg]);
 
   useEffect(() => {
-    if (!userInfo.name) navigate('/login');
-
     if (socket && name) {
       socket.emit('get_room', name, userInfo.name, (room: Room) => {
         setTitle({ name, length: room.attendee.length });
-        const chat = room.chat.map((room) => {
+        setAttendee(room.attendee);
+
+        const chats = room.chat.map((room) => {
           if (room.type === 'message') {
             room.type = room.user === userInfo.name ? 'from' : 'to';
           }
           return room;
         });
-        setMsgs(chat);
-
-        setAttendee(room.attendee);
+        setMsgs(chats);
       });
     }
 

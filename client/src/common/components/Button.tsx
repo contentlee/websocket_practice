@@ -1,10 +1,10 @@
-import { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 import { palette } from '@utils/palette';
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   color?: 'primary' | 'secondary';
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 const Button = ({ color = 'primary', children, ...props }: Props) => {

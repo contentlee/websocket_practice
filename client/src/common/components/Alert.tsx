@@ -1,10 +1,10 @@
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, ReactNode } from 'react';
 
 import { palette } from '@utils/palette';
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   type: 'success' | 'error' | 'warning';
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 const Alert = ({ type, children, ...props }: Props) => {
@@ -14,7 +14,7 @@ const Alert = ({ type, children, ...props }: Props) => {
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         width: '100%',
         maxWidth: '350px',
         height: '2.5em',

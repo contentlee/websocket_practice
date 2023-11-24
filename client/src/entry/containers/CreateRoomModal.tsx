@@ -5,24 +5,27 @@ import { useOutletContext } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Socket } from 'socket.io-client';
 
-import { alertAtom, closeModalAction, modalAtom } from '@atoms/stateAtom';
+import { closeModalAction, modalAtom } from '@atoms/stateAtom';
 import { userAtom } from '@atoms/userAtom';
-import { palette } from '@utils/palette';
-import { useAnimate } from '@hooks';
+import { useAlert, useAnimate } from '@hooks';
 import { Button, Input, TextArea } from '@components';
 
-import { Title } from '../components';
+import { ModalForm, Title } from '../components';
 
 const CreateRoomModal = () => {
   const navigate = useNavigate();
-
-  const [animation, setAnimation] = useAnimate();
+  const [_, setAlert] = useAlert();
+  const [ref, setAnimation] = useAnimate<HTMLFormElement>();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
-  const userInfo = useRecoilValue(userAtom);
+  const { name } = useRecoilValue(userAtom);
   const [{ isOpened }, setModal] = useRecoilState(modalAtom);
-  const [_, setAlert] = useRecoilState(alertAtom);
+
+  const handleChangePage = (path: string) => {
+    setModal(closeModalAction);
+    navigate(path);
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,21 +38,15 @@ const CreateRoomModal = () => {
 
     if (!roomName) return;
 
+    const callback = () => setAnimation('fadeOut', () => handleChangePage(`/chat/${roomName}`));
+
     socket?.emit(
       'create_room',
       roomName,
       maxLength ? maxLength : 100,
       notification,
-      userInfo.name,
-      () => {
-        setAnimation({
-          type: 'fadeOut',
-          callback: () => {
-            navigate(`/chat/${roomName}`);
-            setModal(closeModalAction);
-          },
-        });
-      },
+      name,
+      callback,
     );
   };
 
@@ -60,29 +57,14 @@ const CreateRoomModal = () => {
 
   useEffect(() => {
     const needLogin = () => {
-      setAlert({
-        isOpened: true,
-        type: 'error',
-        children: '로그인이 필요합니다.',
-      });
-
-      setAnimation({
-        type: 'fadeOut',
-        callback: () => {
-          navigate('/login');
-        },
-      });
+      setAlert('error', '로그인이 필요합니다.');
+      setAnimation('fadeOut', () => navigate('/login'));
     };
+    socket.on('need_login', needLogin);
 
     const duplicatedName = () => {
-      setAlert({
-        isOpened: true,
-        type: 'error',
-        children: '중복된 채팅방이 존재합니다.',
-      });
+      setAlert('error', '중복된 채팅방이 존재합니다.');
     };
-
-    socket.on('need_login', needLogin);
     socket.on('duplicated_name', duplicatedName);
 
     return () => {
@@ -92,35 +74,21 @@ const CreateRoomModal = () => {
   }, [navigate, setAlert, setAnimation, socket]);
 
   useEffect(() => {
-    setAnimation({ type: 'fadeIn', callback: () => {} });
+    setAnimation('fadeIn');
   }, [setAnimation]);
+
   return (
     isOpened &&
     createPortal(
-      <form
-        css={{
-          zIndex: 1000,
-          position: 'absolute',
-          top: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          minWidth: '290px',
-          maxWidth: '370px',
-          padding: '20px',
-          gap: '16px',
-          border: '1.5px solid' + palette.main.blk,
-          background: palette.background,
-          boxSizing: 'border-box',
-          animation: animation ? animation + '.2s forwards ease-in-out' : '',
-        }}
-        onSubmit={handleSubmit}
-      >
+      <ModalForm ref={ref} onSubmit={handleSubmit}>
         <Title type="create">채팅방 생성하기</Title>
 
+        {/* 입력란  */}
         <Input label="이름" css={{ width: '100%' }}></Input>
         <Input type="number" label="최대인원" css={{ width: '100%' }}></Input>
         <TextArea label="첫공지" css={{ width: '100%' }}></TextArea>
+
+        {/* 버튼 */}
         <div
           css={{
             display: 'flex',
@@ -132,7 +100,7 @@ const CreateRoomModal = () => {
             취소
           </Button>
         </div>
-      </form>,
+      </ModalForm>,
       document.body,
       'create',
     )

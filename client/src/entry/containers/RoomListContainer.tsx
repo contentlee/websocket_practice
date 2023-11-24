@@ -6,9 +6,9 @@ import { Socket } from 'socket.io-client';
 
 import { alertAtom, modalAtom } from '@atoms/stateAtom';
 import { userAtom } from '@atoms/userAtom';
-import { useAnimate } from '@hooks';
+import { useAlert, useAnimate } from '@hooks';
 
-import { AddItem, RoomItem } from '../components';
+import { AddItem, RoomItem, RoomListLayout } from '../components';
 import { EmptyListContainer } from '.';
 
 interface Room {
@@ -20,106 +20,55 @@ interface Room {
 const RoomListContainer = () => {
   const navigate = useNavigate();
 
-  const [animation, setAnimation] = useAnimate();
+  const [ref, setAnimation] = useAnimate<HTMLDivElement>();
+  const [_, setModal] = useRecoilState(modalAtom);
+  const [__, setAlert] = useAlert();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
-  const userInfo = useRecoilValue(userAtom);
-  const [_, setModal] = useRecoilState(modalAtom);
-  const [__, setAlert] = useRecoilState(alertAtom);
+  const { name: myName } = useRecoilValue(userAtom);
 
   const [rooms, setRooms] = useState<Room[]>([]);
 
-  const handleClickRoom = (e: React.MouseEvent, name: string) => {
+  const handleClickRoom = (e: React.MouseEvent, yourName: string) => {
     e.preventDefault();
-    if (userInfo.name === '') {
-      setAnimation({
-        type: 'fadeOut',
-        callback: () => {
-          navigate('/login');
-        },
-      });
-    } else {
-      socket.emit('enter_room', name, userInfo.name, () => {
-        setAnimation({
-          type: 'fadeOut',
-          callback: () => {
-            navigate(`/chat/${name}`);
-          },
-        });
-      });
-    }
+    const callback = () => setAnimation('fadeOut', () => navigate(`/chat/${name}`));
+    socket.emit('enter_room', yourName, myName, callback);
   };
 
   const handleClickCreate = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (userInfo.name === '') {
-      setAnimation({
-        type: 'fadeOut',
-        callback: () => {
-          navigate('/login');
-        },
-      });
-    } else {
-      setModal({ isOpened: true, type: 'create' });
-    }
+    setModal({ isOpened: true, type: 'create' });
   };
 
   useEffect(() => {
-    socket.emit('get_rooms', userInfo.name, (roomList: Room[]) => {
-      setRooms(roomList);
-    });
+    const changeRoomList = (roomList: Room[]) => setRooms(roomList);
+    socket.emit('get_rooms', myName, changeRoomList);
 
-    const changeRoom = (list: Room[]) => {
-      setRooms(list);
-    };
-    const needLogin = () => {
-      setAnimation({
-        type: 'fadeOut',
-        callback: () => {
-          navigate('/login');
-          setAlert({
-            isOpened: true,
-            type: 'error',
-            children: '로그인이 필요합니다.',
-          });
-        },
-      });
-    };
-
+    const changeRoom = (list: Room[]) => setRooms(list);
     socket.on('change_rooms', changeRoom);
+
+    const needLogin = () => {
+      setAlert('error', '로그인이 필요합니다.');
+      navigate('/login');
+    };
     socket.on('need_login', needLogin);
 
     return () => {
       socket.off('change_rooms', changeRoom);
       socket.off('need_login', needLogin);
     };
-  }, [navigate, setAlert, setAnimation, socket, userInfo.name]);
+  }, [navigate, setAlert, setAnimation, socket, myName]);
 
   if (rooms.length === 0)
     return (
-      <div
-        css={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          gap: '10px',
-        }}
-      >
-        <EmptyListContainer></EmptyListContainer>
-      </div>
+      <RoomListLayout>
+        <EmptyListContainer />
+      </RoomListLayout>
     );
 
   return (
-    <div
-      css={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        gap: '10px',
-        animation: animation ? animation + '.2s forwards ease-out' : '',
-      }}
-    >
+    <RoomListLayout ref={ref}>
       {rooms.map(({ name, attendee, max_length }) => {
         return (
           <RoomItem
@@ -132,7 +81,7 @@ const RoomListContainer = () => {
         );
       })}
       <AddItem onClick={handleClickCreate} />
-    </div>
+    </RoomListLayout>
   );
 };
 

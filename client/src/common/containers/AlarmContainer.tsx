@@ -1,20 +1,17 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
-import { useRecoilState } from 'recoil';
-import { produce } from 'immer';
 import { Socket } from 'socket.io-client';
 
 import CallIcon from '@assets/call_icon_wht.svg';
 import CallRejectIcon from '@assets/call_reject_icon.svg';
 import CancelIcon from '@assets/close_icon.svg';
-import VedioCallIcon from '@assets/video_call_icon_wht.svg';
+import VideoCallIcon from '@assets/video_call_icon_wht.svg';
 
-import { alarmAtom } from '@atoms/stateAtom';
 import { palette } from '@utils/palette';
 import { useAnimate } from '@hooks';
 
-import Icon from '../components/Icon';
+import { Icon } from '../components';
 
 interface Props {
   socket: Socket;
@@ -22,75 +19,58 @@ interface Props {
 
 const AlarmContainer = ({ socket }: Props) => {
   const navigate = useNavigate();
-
   const [animation, setAnimation] = useAnimate();
 
-  const [alarm, setAlarm] = useRecoilState(alarmAtom);
+  const [isOpened, setOpened] = useState(false);
+  const [type, setType] = useState<'call' | 'video'>('call');
   const [name, setName] = useState('');
 
   const handleClickPermit = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    setAnimation({
-      type: 'closeAlarm',
-      time: 600,
-      callback: () => {
-        setAlarm((prev) =>
-          produce(prev, (draft) => {
-            draft.isOpened = false;
-            return draft;
-          }),
-        );
-        setAnimation({ type: 'showAlarm', time: 600, callback: () => {} });
-        navigate(`/${alarm.type}/${name}`);
-      },
-    });
+    const callback = () => {
+      setOpened(false);
+      navigate(`/${type}/${name}`);
+    };
+
+    setAnimation('closeAlarm', callback, 600);
   };
+
   const handleClickCancel = (e: React.MouseEvent) => {
     e.preventDefault();
-    socket.emit('cancel_call', name, () => {
-      setAnimation({
-        type: 'closeAlarm',
-        time: 600,
-        callback: () => {
-          setAlarm((prev) =>
-            produce(prev, (draft) => {
-              draft.isOpened = false;
-              return draft;
-            }),
-          );
-          setAnimation({ type: 'showAlarm', time: 600, callback: () => {} });
-        },
-      });
-    });
+
+    const closeAlarm = () => setOpened(false);
+    const callback = () => setAnimation('closeAlarm', closeAlarm, 600);
+    socket.emit('cancel_call', name, callback);
   };
 
   useEffect(() => {
-    setAnimation({ type: 'showAlarm', time: 600, callback: () => {} });
+    setAnimation('showAlarm', () => {}, 600);
   }, [setAnimation]);
 
   useEffect(() => {
     const requireCall = (userName: string) => {
-      setAlarm({ isOpened: true, type: 'call' });
+      setOpened(true);
+      setType('call');
       setName(userName);
     };
+    socket.on('require_call', requireCall);
 
     const requireVideoCall = (userName: string) => {
-      setAlarm({ isOpened: true, type: 'video' });
+      setOpened(true);
+      setType('video');
       setName(userName);
     };
-
-    socket.on('require_call', requireCall);
     socket.on('require_video_call', requireVideoCall);
 
     return () => {
       socket.off('require_call', requireCall);
       socket.off('require_video_call', requireVideoCall);
     };
-  }, [setAlarm, socket]);
+  }, [socket]);
 
   return (
-    alarm.isOpened &&
+    isOpened &&
     createPortal(
       <div
         css={{
@@ -123,10 +103,7 @@ const AlarmContainer = ({ socket }: Props) => {
               overflow: 'hidden',
             }}
           >
-            <Icon
-              src={alarm.type === 'call' ? CallIcon : VedioCallIcon}
-              onClick={handleClickPermit}
-            ></Icon>
+            <Icon src={TYPE_ICON[type]['permit']} onClick={handleClickPermit}></Icon>
           </div>
           <div
             css={{
@@ -141,10 +118,7 @@ const AlarmContainer = ({ socket }: Props) => {
               overflow: 'hidden',
             }}
           >
-            <Icon
-              src={alarm.type === 'call' ? CallRejectIcon : CancelIcon}
-              onClick={handleClickCancel}
-            ></Icon>
+            <Icon src={TYPE_ICON[type]['reject']} onClick={handleClickCancel}></Icon>
           </div>
         </div>
       </div>,
@@ -154,4 +128,14 @@ const AlarmContainer = ({ socket }: Props) => {
   );
 };
 
+const TYPE_ICON = {
+  call: {
+    permit: CallIcon,
+    reject: CallRejectIcon,
+  },
+  video: {
+    permit: VideoCallIcon,
+    reject: CancelIcon,
+  },
+};
 export default AlarmContainer;

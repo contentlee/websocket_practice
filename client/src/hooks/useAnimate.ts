@@ -1,32 +1,44 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-import { keyframes, Keyframes } from '@emotion/react';
+import { keyframes } from '@emotion/react';
 
-export interface Animation {
-  type: 'fadeIn' | 'fadeOut' | 'alert' | 'showAlarm' | 'closeAlarm';
-  callback?: () => void;
-  time?: number;
-}
-type Return = [Keyframes | undefined, React.Dispatch<React.SetStateAction<Animation | undefined>>];
+type RefType<T> = T | null;
 
-const useAnimate = (): Return => {
+type AnimationType = 'fadeIn' | 'fadeOut' | 'alert' | 'showAlarm' | 'closeAlarm';
+type Animation = [AnimationType, () => void, number];
+
+type Return<T> = [
+  React.MutableRefObject<RefType<T>>,
+  (type: AnimationType, callback?: () => void, time?: number) => void,
+];
+
+const useAnimate = <T extends HTMLElement>(): Return<T> => {
+  const ref = useRef<RefType<T>>(null);
   const [animation, setAnimation] = useState<Animation>();
+
+  const handleChangeAnimationState = (type: AnimationType, callback = () => {}, time = 300) => {
+    setAnimation([type, callback, time]);
+  };
+
+  const handleChangeElementStyle = (type: AnimationType, time: number) => {
+    const str = ANIMATE_TYPE[type] + `${time - 100 / 1000}s forwards ease-out`;
+    if (ref.current) ref.current.style.animation = str;
+  };
 
   useEffect(() => {
     if (animation) {
-      const timer = setTimeout(
-        () => {
-          if (animation.callback) animation.callback();
-        },
-        animation.time ? animation.time : 300,
-      );
+      const [type, callback, time] = animation;
 
+      handleChangeElementStyle(type, time);
+
+      const timer = setTimeout(callback, time);
       return () => {
         clearTimeout(timer);
       };
     }
   }, [animation]);
-  return [animation?.type ? ANIMATE_TYPE[animation.type] : undefined, setAnimation];
+
+  return [ref, handleChangeAnimationState];
 };
 
 const ANIMATE_TYPE = {

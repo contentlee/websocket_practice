@@ -1,7 +1,7 @@
 import { produce } from 'immer';
-import { atom } from 'recoil';
+import { atom, useRecoilState } from 'recoil';
 
-interface Alert {
+export interface Alert {
   isOpened: boolean;
   type: 'success' | 'error' | 'warning';
   children: React.ReactNode;
@@ -40,16 +40,3 @@ export const closeModalAction = (prev: Modal) =>
     draft.isOpened = false;
     return draft;
   });
-
-interface Alarm {
-  isOpened: boolean;
-  type: 'call' | 'video';
-}
-
-export const alarmAtom = atom<Alarm>({
-  key: 'alarmAtom',
-  default: {
-    isOpened: false,
-    type: 'call',
-  },
-});

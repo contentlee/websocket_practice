@@ -77,14 +77,11 @@ const CallContainer = () => {
   // close page
   const handleClickExit = (e: React.MouseEvent) => {
     e.preventDefault();
-    setAnimation({
-      type: 'fadeOut',
-      callback: () => {
-        socket.emit('end_call', name, () => {
-          peerConnection.current?.close();
-          navigate(-1);
-        });
-      },
+    setAnimation('fadeOut', () => {
+      socket.emit('end_call', name, () => {
+        peerConnection.current?.close();
+        navigate(-1);
+      });
     });
   };
 
@@ -155,12 +152,9 @@ const CallContainer = () => {
           type: 'warning',
           children: '상대방이 통화를 거부하였습니다.',
         });
-        setAnimation({
-          type: 'fadeOut',
-          callback: () => {
-            peerConnection.current?.close();
-            navigate(-1);
-          },
+        setAnimation('fadeOut', () => {
+          peerConnection.current?.close();
+          navigate(-1);
         });
       });
     };
@@ -171,12 +165,9 @@ const CallContainer = () => {
         type: 'warning',
         children: '상대방이 통화를 종료하였습니다.',
       });
-      setAnimation({
-        type: 'fadeOut',
-        callback: () => {
-          peerConnection.current?.close();
-          navigate(-1);
-        },
+      setAnimation('fadeOut', () => {
+        peerConnection.current?.close();
+        navigate(-1);
       });
     };
 

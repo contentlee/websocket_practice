@@ -1,5 +1,5 @@
+import useAlert from './useAlert';
 import useAnimate from './useAnimate';
-export { useAnimate };
+import useModal from './useModal';
 
-import type { Animation } from './useAnimate';
-export type { Animation };
+export { useAlert, useAnimate, useModal };

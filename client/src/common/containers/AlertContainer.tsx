@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useRecoilState } from 'recoil';
 
-import SucessIcon from '@assets/success_icon.svg';
+import SuccessIcon from '@assets/success_icon.svg';
 import ErrorIcon from '@assets/error_icon.svg';
 import WarningIcon from '@assets/warning_icon.svg';
 import CloseIcon from '@assets/close_icon.svg';
@@ -10,15 +10,12 @@ import CloseIcon from '@assets/close_icon.svg';
 import { alertAtom, closeAlertAction } from '@atoms/stateAtom';
 import { useAnimate } from '@hooks';
 
-import Alert from '../components/Alert';
-import Icon from '../components/Icon';
+import { Alert, Icon, AlertLayout } from '../components';
 
 const AlertContainer = () => {
-  const [animation, setAnimation] = useAnimate();
+  const [{ isOpened, type, children }, setAlert] = useRecoilState(alertAtom);
 
-  const [alert, setAlert] = useRecoilState(alertAtom);
-
-  const { type, children } = alert;
+  const [ref, setAnimation] = useAnimate<HTMLDivElement>();
 
   const handleClickClose = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -26,52 +23,36 @@ const AlertContainer = () => {
   };
 
   useEffect(() => {
-    setAnimation({ type: 'alert', time: 5000, callback: () => {} });
+    setAnimation('alert', () => {}, 5000);
   }, [setAnimation]);
 
   useEffect(() => {
-    if (alert.isOpened) {
-      const fadeout = setTimeout(() => {
-        setAlert(closeAlertAction);
-      }, 5000);
+    if (isOpened) {
+      const fadeout = setTimeout(() => setAlert(closeAlertAction), 5000);
       return () => clearTimeout(fadeout);
     }
   }, [alert, setAlert]);
 
   return (
-    alert.isOpened &&
+    isOpened &&
     createPortal(
-      <div
-        css={{
-          zIndex: '1000',
-          position: 'absolute',
-          top: '20px',
-          display: 'flex',
-          justifyContent: 'center',
-          width: '100%',
-          animation: `${animation} 4.8s ease-in forwards`,
-        }}
-      >
+      <AlertLayout ref={ref}>
         <Alert type={type}>
-          {type === 'success' && <Icon src={SucessIcon}></Icon>}
-          {type === 'error' && <Icon src={ErrorIcon}></Icon>}
-          {type === 'warning' && <Icon src={WarningIcon}></Icon>}
-
+          <Icon src={ALERT_ICON[type]}></Icon>
           {children}
-          <div
-            css={{
-              position: 'absolute',
-              right: '14px',
-            }}
-          >
-            <Icon src={CloseIcon} onClick={handleClickClose}></Icon>
-          </div>
+          <Icon src={CloseIcon} onClick={handleClickClose}></Icon>
         </Alert>
-      </div>,
+      </AlertLayout>,
       document.body,
       'alert',
     )
   );
+};
+
+const ALERT_ICON = {
+  success: SuccessIcon,
+  error: ErrorIcon,
+  warning: WarningIcon,
 };
 
 export default AlertContainer;

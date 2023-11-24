@@ -1,4 +1,5 @@
 import Alert from './Alert';
+import AlertLayout from './AlertLayout';
 import Button from './Button';
 import Icon from './Icon';
 import Input from './Input';
@@ -8,4 +9,15 @@ import Polygon from './Polygon';
 import Regtangle from './Regtangle';
 import TextArea from './TextArea';
 
-export { Alert, Button, Icon, Input, Overlay, PageLayout, Polygon, Regtangle, TextArea };
+export {
+  Alert,
+  AlertLayout,
+  Button,
+  Icon,
+  Input,
+  Overlay,
+  PageLayout,
+  Polygon,
+  Regtangle,
+  TextArea,
+};

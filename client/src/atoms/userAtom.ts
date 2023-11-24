@@ -1,4 +1,5 @@
-import { atom } from 'recoil';
+import { produce } from 'immer';
+import { atom, useRecoilState } from 'recoil';
 
 interface User {
   name: string;
@@ -10,3 +11,13 @@ export const userAtom = atom<User>({
     name: '',
   },
 });
+
+const [_, setUser] = useRecoilState(userAtom);
+
+export const changeUser = (value: string): void =>
+  setUser((prev) =>
+    produce(prev, (draft) => {
+      draft.name = value;
+      return draft;
+    }),
+  );
