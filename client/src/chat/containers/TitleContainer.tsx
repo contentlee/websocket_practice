@@ -20,12 +20,12 @@ const TitleContainer = () => {
 
   const title = useContext(TitleContext);
 
-  const userInfo = useRecoilValue(userAtom);
+  const { name: myName } = useRecoilValue(userAtom);
   const [_, setModal] = useRecoilState(modalAtom);
 
   const handleClickLeave = (e: React.MouseEvent) => {
     e.preventDefault();
-    socket.emit('leave_room', title.name, userInfo.name, () => {
+    socket.emit('leave_room', title.name, myName, () => {
       navigate('/');
     });
   };

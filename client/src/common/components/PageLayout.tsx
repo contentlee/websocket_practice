@@ -1,20 +1,24 @@
-import { HTMLAttributes, useEffect, ReactNode } from 'react';
-
 import { useAnimate } from '@hooks';
+import { HTMLAttributes, ReactNode, useEffect, useRef } from 'react';
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
 }
 
 const PageLayout = ({ children, ...props }: Props) => {
-  const [ref, setAnimation] = useAnimate<HTMLDivElement>();
-  useEffect(() => {
-    setAnimation('fadeIn');
-  }, [setAnimation]);
+  // const ref = useRef<HTMLDivElement>(null)
+  // const [setRef ,setAnimation] = useAnimate();
 
+  // useEffect(() => {
+  //   setRef(ref.current)
+  //   setAnimation('fadeIn');
+  //   return () => {
+  //     setAnimation('fadeOut');
+  //   };
+  // }, []);
   return (
     <div
-      ref={ref}
+      // ref={ref}
       css={{
         width: '100%',
         minWidth: '310px',

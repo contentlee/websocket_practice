@@ -9,7 +9,6 @@ import CancelIcon from '@assets/close_icon.svg';
 import VideoCallIcon from '@assets/video_call_icon_wht.svg';
 
 import { palette } from '@utils/palette';
-import { useAnimate } from '@hooks';
 
 import { Icon } from '../components';
 
@@ -19,7 +18,6 @@ interface Props {
 
 const AlarmContainer = ({ socket }: Props) => {
   const navigate = useNavigate();
-  const [animation, setAnimation] = useAnimate();
 
   const [isOpened, setOpened] = useState(false);
   const [type, setType] = useState<'call' | 'video'>('call');
@@ -28,25 +26,16 @@ const AlarmContainer = ({ socket }: Props) => {
   const handleClickPermit = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    const callback = () => {
-      setOpened(false);
-      navigate(`/${type}/${name}`);
-    };
-
-    setAnimation('closeAlarm', callback, 600);
+    setOpened(false);
+    navigate(`/${type}/${name}`);
   };
 
   const handleClickCancel = (e: React.MouseEvent) => {
     e.preventDefault();
 
     const closeAlarm = () => setOpened(false);
-    const callback = () => setAnimation('closeAlarm', closeAlarm, 600);
-    socket.emit('cancel_call', name, callback);
+    socket.emit('cancel_call', name, closeAlarm);
   };
-
-  useEffect(() => {
-    setAnimation('showAlarm', () => {}, 600);
-  }, [setAnimation]);
 
   useEffect(() => {
     const requireCall = (userName: string) => {
@@ -99,7 +88,6 @@ const AlarmContainer = ({ socket }: Props) => {
               borderRadius: 50,
               background: palette.point.green,
               boxShadow: '2px 2px 10px 1px rgba(0,0,0,.2)',
-              animation: animation + '.5s ease-in forwards',
               overflow: 'hidden',
             }}
           >
@@ -114,7 +102,6 @@ const AlarmContainer = ({ socket }: Props) => {
               borderRadius: 50,
               background: palette.point.red,
               boxShadow: '2px 2px 10px 1px rgba(0,0,0,.2)',
-              animation: animation + '.5s ease-in forwards',
               overflow: 'hidden',
             }}
           >

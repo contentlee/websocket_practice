@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { atom, useRecoilState } from 'recoil';
+import { atom } from 'recoil';
 
 export interface Alert {
   isOpened: boolean;
@@ -24,7 +24,7 @@ export const closeAlertAction = (prev: Alert) =>
 
 interface Modal {
   isOpened: boolean;
-  type: 'create' | 'attendeeList';
+  type: string;
 }
 
 export const modalAtom = atom<Modal>({
@@ -34,9 +34,3 @@ export const modalAtom = atom<Modal>({
     type: 'create',
   },
 });
-
-export const closeModalAction = (prev: Modal) =>
-  produce(prev, (draft) => {
-    draft.isOpened = false;
-    return draft;
-  });

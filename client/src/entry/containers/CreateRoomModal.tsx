@@ -1,86 +1,66 @@
 import { useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
 import { useOutletContext } from 'react-router-dom';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue, useResetRecoilState } from 'recoil';
 import { Socket } from 'socket.io-client';
 
-import { closeModalAction, modalAtom } from '@atoms/stateAtom';
 import { userAtom } from '@atoms/userAtom';
-import { useAlert, useAnimate } from '@hooks';
+import { modalAtom } from '@atoms/stateAtom';
+
+import { useAlert } from '@hooks';
 import { Button, Input, TextArea } from '@components';
 
 import { ModalForm, Title } from '../components';
+import { ModalContainer } from 'src/common/containers';
 
 const CreateRoomModal = () => {
   const navigate = useNavigate();
+
   const [_, setAlert] = useAlert();
-  const [ref, setAnimation] = useAnimate<HTMLFormElement>();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
   const { name } = useRecoilValue(userAtom);
-  const [{ isOpened }, setModal] = useRecoilState(modalAtom);
+  const resetModal = useResetRecoilState(modalAtom);
 
   const handleChangePage = (path: string) => {
-    setModal(closeModalAction);
+    resetModal();
     navigate(path);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const [roomName, maxLength, notification] = [
-      (e.currentTarget[0] as HTMLInputElement).value,
-      (e.currentTarget[1] as HTMLInputElement).value,
-      (e.currentTarget[2] as HTMLInputElement).value,
-    ];
+    const [roomName, maxLength, notification] = e.currentTarget.map(
+      (element: HTMLInputElement) => element.value,
+    );
 
     if (!roomName) return;
 
-    const callback = () => setAnimation('fadeOut', () => handleChangePage(`/chat/${roomName}`));
-
-    socket?.emit(
-      'create_room',
-      roomName,
-      maxLength ? maxLength : 100,
-      notification,
-      name,
-      callback,
-    );
+    const info = { roomName, maxLength: maxLength ? maxLength : 100, notification, name };
+    const callback = () => handleChangePage(`/chat/${roomName}`);
+    socket?.emit('create_room', info, callback);
   };
 
   const handleClickCancel = (e: React.MouseEvent) => {
     e.preventDefault();
-    setModal(closeModalAction);
+    resetModal();
   };
 
   useEffect(() => {
-    const needLogin = () => {
-      setAlert('error', '로그인이 필요합니다.');
-      setAnimation('fadeOut', () => navigate('/login'));
-    };
-    socket.on('need_login', needLogin);
-
     const duplicatedName = () => {
       setAlert('error', '중복된 채팅방이 존재합니다.');
     };
     socket.on('duplicated_name', duplicatedName);
 
     return () => {
-      socket.off('need_login', needLogin);
       socket.off('duplicated_name', duplicatedName);
     };
-  }, [navigate, setAlert, setAnimation, socket]);
-
-  useEffect(() => {
-    setAnimation('fadeIn');
-  }, [setAnimation]);
+  }, [navigate, setAlert, socket]);
 
   return (
-    isOpened &&
-    createPortal(
-      <ModalForm ref={ref} onSubmit={handleSubmit}>
+    <ModalContainer name="create">
+      <ModalForm onSubmit={handleSubmit}>
         <Title type="create">채팅방 생성하기</Title>
 
         {/* 입력란  */}
@@ -100,10 +80,8 @@ const CreateRoomModal = () => {
             취소
           </Button>
         </div>
-      </ModalForm>,
-      document.body,
-      'create',
-    )
+      </ModalForm>
+    </ModalContainer>
   );
 };
 

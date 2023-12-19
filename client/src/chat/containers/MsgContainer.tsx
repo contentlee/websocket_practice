@@ -10,7 +10,6 @@ import { HandlerContext, MsgContext } from '../contexts/ChatContext';
 const MsgContainer = () => {
   const navigate = useNavigate();
 
-  const [animation, setAnimation] = useAnimate();
   const [_, setAlert] = useAlert();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
@@ -21,11 +20,6 @@ const MsgContainer = () => {
   const { handleAddMsg } = useContext(HandlerContext);
 
   useEffect(() => {
-    const needLogin = () => {
-      setAlert('error', '로그인이 필요합니다.');
-      setAnimation('fadeOut', () => navigate('/login'));
-    };
-
     const welcome = (user: string) => {
       handleAddMsg({
         type: 'welcome',
@@ -34,10 +28,12 @@ const MsgContainer = () => {
         date: new Date(),
       });
     };
+    socket.on('welcome', welcome);
 
     const newMessage = (user: string, msg: string) => {
       handleAddMsg({ type: 'to', user, msg, date: new Date() });
     };
+    socket.on('new_message', newMessage);
 
     const bye = (user: string) => {
       handleAddMsg({
@@ -47,26 +43,18 @@ const MsgContainer = () => {
         date: new Date(),
       });
     };
-
-    socket.on('need_login', needLogin);
-    socket.on('welcome', welcome);
-    socket.on('new_message', newMessage);
     socket.on('bye', bye);
 
     return () => {
-      socket.off('need_login', needLogin);
       socket.off('welcome', welcome);
       socket.off('new_message', newMessage);
       socket.off('bye', bye);
     };
-  }, [handleAddMsg, navigate, setAlert, setAnimation, socket]);
+  }, [handleAddMsg, navigate, setAlert, socket]);
 
   useEffect(() => {
     if (wrapRef.current) {
-      // const clientHeight = wrapRef.current.clientHeight;
-      // const curScroll = wrapRef.current.scrollTop;
       const scrollHeight = wrapRef.current.scrollHeight;
-      // if (clientHeight + curScroll > scrollHeight - 200)
       wrapRef.current.scrollTop = scrollHeight;
     }
   }, [msgs]);
@@ -80,7 +68,6 @@ const MsgContainer = () => {
         gap: '10px',
         padding: '64px 20px 52px',
         overflow: 'auto',
-        animation: animation ? animation + '.2s forwards ease-out' : '',
       }}
     >
       {msgs.map(({ type, msg, user }, i) => {

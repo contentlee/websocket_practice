@@ -15,6 +15,7 @@ export default defineConfig({
         find: '@components',
         replacement: resolve(__dirname, 'src/common/components'),
       },
+      { find: '@containers', replacement: resolve(__dirname, 'src/common/containers') },
       { find: '@entry', replacement: resolve(__dirname, 'src/entry/pages') },
       { find: '@hooks', replacement: resolve(__dirname, 'src/hooks') },
       { find: '@login', replacement: resolve(__dirname, 'src/login/pages') },

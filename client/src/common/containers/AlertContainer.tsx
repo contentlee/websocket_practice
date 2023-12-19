@@ -8,23 +8,16 @@ import WarningIcon from '@assets/warning_icon.svg';
 import CloseIcon from '@assets/close_icon.svg';
 
 import { alertAtom, closeAlertAction } from '@atoms/stateAtom';
-import { useAnimate } from '@hooks';
 
 import { Alert, Icon, AlertLayout } from '../components';
 
 const AlertContainer = () => {
   const [{ isOpened, type, children }, setAlert] = useRecoilState(alertAtom);
 
-  const [ref, setAnimation] = useAnimate<HTMLDivElement>();
-
   const handleClickClose = (e: React.MouseEvent) => {
     e.preventDefault();
     setAlert(closeAlertAction);
   };
-
-  useEffect(() => {
-    setAnimation('alert', () => {}, 5000);
-  }, [setAnimation]);
 
   useEffect(() => {
     if (isOpened) {
@@ -36,7 +29,7 @@ const AlertContainer = () => {
   return (
     isOpened &&
     createPortal(
-      <AlertLayout ref={ref}>
+      <AlertLayout>
         <Alert type={type}>
           <Icon src={ALERT_ICON[type]}></Icon>
           {children}

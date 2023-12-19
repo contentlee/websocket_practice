@@ -1,14 +1,14 @@
 import { PageLayout } from '@components';
 
-import { ConnectionContext } from '../contexts';
 import { VideoContainer } from '../containers';
+import { VideoConnectionContext } from '../contexts';
 
 const VideoPage = () => {
   return (
     <PageLayout>
-      <ConnectionContext>
+      <VideoConnectionContext>
         <VideoContainer />
-      </ConnectionContext>
+      </VideoConnectionContext>
     </PageLayout>
   );
 };

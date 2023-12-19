@@ -15,7 +15,7 @@ const SendForm = ({ ...props }: Props) => {
 
   const { name } = useParams();
 
-  const userInfo = useRecoilValue(userAtom);
+  const { name: myName } = useRecoilValue(userAtom);
 
   const { handleAddMsg } = useContext(HandlerContext);
 
@@ -23,12 +23,12 @@ const SendForm = ({ ...props }: Props) => {
     e.preventDefault();
     const target = e.currentTarget[0] as HTMLInputElement;
     if (!target.value) return;
-    socket.emit('new_message', target.value, name, userInfo.name, () => {
+    socket.emit('new_message', target.value, name, myName, () => {
       handleAddMsg({
         type: 'from',
         date: new Date(),
         msg: target.value,
-        user: userInfo.name,
+        user: myName,
       });
       target.value = '';
     });

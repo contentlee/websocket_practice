@@ -1,14 +1,14 @@
 import { PageLayout } from '@components';
 
-import { ConnectionContext } from '../contexts';
 import { CallContainer } from '../containers';
+import { CallConnectionContext } from '../contexts';
 
 const CallPage = () => {
   return (
     <PageLayout>
-      <ConnectionContext>
+      <CallConnectionContext>
         <CallContainer />
-      </ConnectionContext>
+      </CallConnectionContext>
     </PageLayout>
   );
 };

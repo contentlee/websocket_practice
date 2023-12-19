@@ -48,10 +48,7 @@ class SocketController {
   };
 
   public createRoom = async (
-    roomName: string,
-    maxLength: string,
-    notification: string,
-    userName: string,
+    { roomName, maxLength, notification, userName }: { [index: string]: string },
     done: () => void
   ) => {
     if (!userName) return this.requireValidation();
@@ -131,7 +128,6 @@ class SocketController {
       this.socket.emit("not_found_user");
     }
   };
-
 
   public permitCall = (fromUserName: string, done: () => void) => {
     this.socket.join(fromUserName);

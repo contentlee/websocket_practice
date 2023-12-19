@@ -3,92 +3,33 @@ import { useNavigate, useOutletContext, useParams } from 'react-router';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Socket } from 'socket.io-client';
 
-import AudioOnIcon from '@assets/mic_on_icon.svg';
-import AudioOffIcon from '@assets/mic_off_icon.svg';
-
 import { alertAtom } from '@atoms/stateAtom';
 import { userAtom } from '@atoms/userAtom';
 import { palette } from '@utils/palette';
-import { useAnimate } from '@hooks';
-import { Button, Icon } from '@components';
 
-import { getMedia } from '../helpers/connection';
-import { Connection } from '../contexts';
-import { Select } from '../components';
+import { CallConnection } from '../contexts';
+import CallOption from './CallOption';
 
 const CallContainer = () => {
   const navigate = useNavigate();
 
-  const [animation, setAnimation] = useAnimate();
-  const [_, setAlert] = useRecoilState(alertAtom);
-
-  const userInfo = useRecoilValue(userAtom);
+  const { name: roomName } = useParams();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
 
-  const { name } = useParams();
+  const [_, setAlert] = useRecoilState(alertAtom);
+  const { name: myName } = useRecoilValue(userAtom);
 
-  const { peerConnection, audioList, stream, audioRef } = useContext(Connection);
-
-  const [selectedAudio, setSelectedAudio] = useState<MediaStreamTrack>();
-  const [onAudio, setOnAudio] = useState(false);
+  const { peerConnection, audioList, audioRef } = useContext(CallConnection);
 
   const [callState, setCallState] = useState('waiting');
   const [permit, setPermit] = useState(false);
 
-  if (name !== userInfo.name && !permit && peerConnection.current) {
-    socket.emit('permit_call', name, () => {
+  if (roomName !== myName && !permit && peerConnection.current) {
+    socket.emit('permit_call', roomName, () => {
       setPermit(true);
     });
   }
-
-  // select audio
-  const handleChangeAudio = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    e.preventDefault();
-
-    const value = e.target.value;
-    const mediaStream = await getMedia({ audio: { deviceId: value } });
-
-    setSelectedAudio(mediaStream.getTracks()[0]);
-
-    const audioSender = peerConnection.current
-      ?.getSenders()
-      .find((sender) => sender.track?.kind === 'audio');
-
-    await audioSender?.replaceTrack(mediaStream.getTracks()[0]);
-
-    if (!onAudio)
-      mediaStream.getAudioTracks().forEach((track) => {
-        track.enabled = !track.enabled;
-      });
-
-    stream.current = mediaStream;
-  };
-
-  // mute or unmute
-  const handleClickAudioToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    stream.current?.getAudioTracks().forEach((track) => {
-      track.enabled = !track.enabled;
-      setOnAudio(track.enabled);
-    });
-  };
-
-  // close page
-  const handleClickExit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setAnimation('fadeOut', () => {
-      socket.emit('end_call', name, () => {
-        peerConnection.current?.close();
-        navigate(-1);
-      });
-    });
-  };
-
-  useEffect(() => {
-    setSelectedAudio(stream.current?.getTracks()[0]);
-    setOnAudio(true);
-  }, [stream]);
 
   useEffect(() => {
     const permitCall = async () => {
@@ -96,7 +37,7 @@ const CallContainer = () => {
         const offer = await peerConnection.current?.createOffer();
         await peerConnection.current?.setLocalDescription(offer);
         // send your offer (2)
-        socket.emit('offer', name, offer, () => {
+        socket.emit('offer', roomName, offer, () => {
           setAlert({
             isOpened: true,
             type: 'success',
@@ -115,7 +56,7 @@ const CallContainer = () => {
         await peerConnection.current?.setLocalDescription(answer);
 
         // send my answer (this name is roomname) (4)
-        socket.emit('answer', name, answer, () => {
+        socket.emit('answer', roomName, answer, () => {
           setAlert({
             isOpened: true,
             type: 'success',
@@ -146,16 +87,14 @@ const CallContainer = () => {
     };
 
     const cancelCall = () => {
-      socket.emit('end_call', name, () => {
+      socket.emit('end_call', roomName, () => {
         setAlert({
           isOpened: true,
           type: 'warning',
           children: '상대방이 통화를 거부하였습니다.',
         });
-        setAnimation('fadeOut', () => {
-          peerConnection.current?.close();
-          navigate(-1);
-        });
+        peerConnection.current?.close();
+        navigate(-1);
       });
     };
 
@@ -165,10 +104,8 @@ const CallContainer = () => {
         type: 'warning',
         children: '상대방이 통화를 종료하였습니다.',
       });
-      setAnimation('fadeOut', () => {
-        peerConnection.current?.close();
-        navigate(-1);
-      });
+      peerConnection.current?.close();
+      navigate(-1);
     };
 
     // when partner permit your call (1)
@@ -196,7 +133,7 @@ const CallContainer = () => {
       socket.off('icecandidate', icecandidate);
       socket.off('end_call', endCall);
     };
-  }, [name, userInfo.name, socket, peerConnection, navigate, setAlert, setAnimation]);
+  }, [roomName, socket, peerConnection, navigate, setAlert]);
 
   return (
     <div
@@ -208,7 +145,6 @@ const CallContainer = () => {
         height: '100%',
         boxSizing: 'border-box',
         overflow: 'hidden',
-        animation: animation ? animation + '.2s forwards ease-out' : '',
       }}
     >
       <audio
@@ -258,36 +194,7 @@ const CallContainer = () => {
           </div>
         )}
       </div>
-      <div
-        css={{
-          zIndex: 1000,
-          position: 'fixed',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          bottom: 0,
-          width: '100%',
-          maxWidth: '390px',
-          minWidth: '310px',
-          boxSizing: 'border-box',
-        }}
-      >
-        <Select
-          defaultValue={selectedAudio?.id}
-          option={audioList}
-          onChange={handleChangeAudio}
-        ></Select>
-
-        <div css={{ display: 'flex', width: '100%' }}>
-          <Button css={{ flex: 1 / 2 }} onClick={handleClickAudioToggle}>
-            <Icon src={onAudio ? AudioOnIcon : AudioOffIcon}></Icon>
-          </Button>
-          <Button css={{ flex: 1 / 2 }} color="secondary" onClick={handleClickExit}>
-            나가기
-          </Button>
-        </div>
-      </div>
+      <CallOption />
     </div>
   );
 };

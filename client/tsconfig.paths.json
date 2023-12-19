@@ -2,11 +2,13 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
+      "@api/*": ["src/api/*"],
       "@assets/*": ["src/assets/*"],
       "@atoms/*": ["src/atoms/*"],
       "@call": ["src/call/pages"],
       "@chat": ["src/chat/pages"],
       "@components": ["src/common/components"],
+      "@containers": ["src/common/containers"],
       "@entry": ["src/entry/pages"],
       "@hooks": ["src/hooks"],
       "@login": ["src/login/pages"],

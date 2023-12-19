@@ -1,3 +1,4 @@
-import ConnectionContext, { Connection } from './ConnectionContext';
+import CallConnectionContext, { CallConnection } from './CallConnectionContext';
+import VideoConnectionContext, { VideoConnection } from './VideoConnectionContext';
 
-export { ConnectionContext, Connection };
+export { CallConnection, CallConnectionContext, VideoConnection, VideoConnectionContext };

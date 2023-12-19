@@ -1,19 +1,19 @@
 import { useOutletContext } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import { Socket } from 'socket.io-client';
 
-import { changeUser } from '@atoms/userAtom';
-import { useAnimate } from '@hooks';
+import { changeUser, userAtom } from '@atoms/userAtom';
 import { Input, Button } from '@components';
 
 const LoginContainer = () => {
-  const [ref, setAnimation] = useAnimate<HTMLFormElement>();
-
   const { socket } = useOutletContext<{ socket: Socket }>();
+
+  const [_, setUser] = useRecoilState(userAtom);
 
   const handleNameSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { value } = e.currentTarget[0] as HTMLInputElement;
-    const callback = () => setAnimation('fadeOut', () => changeUser(value));
+    const callback = () => setUser(changeUser(value));
 
     // 추후 로그인 구현 예정
     socket.emit('login', value, callback);
@@ -21,7 +21,6 @@ const LoginContainer = () => {
 
   return (
     <form
-      ref={ref}
       onSubmit={handleNameSubmit}
       css={{
         display: 'flex',

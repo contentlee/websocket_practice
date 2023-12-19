@@ -15,8 +15,8 @@ const EntryPage = () => {
       }}
     >
       <Title>활성화된 채팅방</Title>
-      <CreateRoomModal></CreateRoomModal>
       <RoomListContainer></RoomListContainer>
+      <CreateRoomModal />
     </PageLayout>
   );
 };

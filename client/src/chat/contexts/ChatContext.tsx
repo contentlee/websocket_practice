@@ -35,9 +35,10 @@ export const HandlerContext = createContext({
 const ChatContext = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
-  const { name } = useParams();
+  const { name: roomName } = useParams();
 
   const { socket } = useOutletContext<{ socket: Socket }>();
+
   const userInfo = useRecoilValue(userAtom);
 
   const [title, setTitle] = useState({ name: '익명', length: 0 });
@@ -47,14 +48,16 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
   const handleAddMsg = (msg: Msg) => setMsgs([...msgs, msg]);
 
   useEffect(() => {
-    if (socket && name) {
-      socket.emit('get_room', name, userInfo.name, (room: Room) => {
-        setTitle({ name, length: room.attendee.length });
+    const { name: myName } = userInfo;
+
+    if (socket && roomName) {
+      socket.emit('get_room', roomName, myName, (room: Room) => {
+        setTitle({ name: roomName, length: room.attendee.length });
         setAttendee(room.attendee);
 
         const chats = room.chat.map((room) => {
           if (room.type === 'message') {
-            room.type = room.user === userInfo.name ? 'from' : 'to';
+            room.type = room.user === myName ? 'from' : 'to';
           }
           return room;
         });
@@ -71,6 +74,8 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
       );
       setAttendee([...attendee, { user: userName, msg_index: 0 }]);
     };
+    socket.on('welcome', welcome);
+
     const leave = (userName: string) => {
       setTitle((prev) =>
         produce(prev, (draft) => {
@@ -87,15 +92,13 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
         }),
       );
     };
-
-    socket.on('welcome', welcome);
     socket.on('leave', leave);
 
     return () => {
       socket.off('welcome', welcome);
       socket.off('leave', leave);
     };
-  }, [socket, userInfo, name, attendee, navigate]);
+  }, [socket, userInfo, roomName, attendee, navigate]);
 
   return (
     <TitleContext.Provider value={title}>
