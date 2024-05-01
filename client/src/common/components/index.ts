@@ -1,23 +1,31 @@
-import Alert from './Alert';
-import AlertLayout from './AlertLayout';
+import Alarm from './alarm';
+import Alert from './alert';
 import Button from './Button';
+import Circle from './Circle';
 import Icon from './Icon';
 import Input from './Input';
+import Modal from './Modal';
 import PageLayout from './PageLayout';
-import Overlay from './Overlay';
 import Polygon from './Polygon';
 import Regtangle from './Regtangle';
+import Select from './Select';
+import Spinner from './Spinner';
 import TextArea from './TextArea';
+import Title from './Title';
 
 export {
+  Alarm,
   Alert,
-  AlertLayout,
   Button,
+  Circle,
   Icon,
   Input,
-  Overlay,
+  Modal,
   PageLayout,
   Polygon,
   Regtangle,
+  Select,
+  Spinner,
   TextArea,
+  Title,
 };

@@ -1,8 +1,3 @@
-import EnterMsg from './EnterMsg';
-import FromMsg from './FromMsg';
-import InputMsg from './InputMsg';
-import RoomTitle from './RoomTitle';
-import ToMsg from './ToMsg';
-import User from './User';
+import ChatLayout from './ChatLayout';
 
-export { EnterMsg, FromMsg, InputMsg, RoomTitle, ToMsg, User };
+export { ChatLayout };

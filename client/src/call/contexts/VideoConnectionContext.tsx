@@ -1,11 +1,9 @@
 import { createContext, useRef, useEffect, useState } from 'react';
 import { useOutletContext, useParams } from 'react-router';
-import { useRecoilState } from 'recoil';
 import { Socket } from 'socket.io-client';
 
-import { alertAtom } from '@atoms/stateAtom';
-
 import { getDevices, getMedia } from '../helpers/connection';
+import { useGetVideo } from '@hooks';
 
 interface Connection {
   myVideoRef: React.RefObject<HTMLVideoElement>;
@@ -32,14 +30,12 @@ const VideoConnectionContext = ({ children }: { children: React.ReactNode }) => 
   const { name } = useParams();
 
   // common UI
-  const [_, setAlert] = useRecoilState(alertAtom);
-
   const stream = useRef<MediaStream | null>(null);
 
   const myVideoRef = useRef<HTMLVideoElement>(null);
   const peerVideoRef = useRef<HTMLVideoElement>(null);
-  const [videoList, setVideoList] = useState<MediaDeviceInfo[]>([]);
-  const [audioList, setAudioList] = useState<MediaDeviceInfo[]>([]);
+
+  const { mediaStream, videoList, audioList } = useGetVideo();
 
   // connection init
   const peerConnection = useRef<RTCPeerConnection | null>(null);
@@ -47,23 +43,6 @@ const VideoConnectionContext = ({ children }: { children: React.ReactNode }) => 
   useEffect(() => {
     const videoInit = async () => {
       try {
-        const audioDevices = await getDevices('audioinput');
-        const videoDevices = await getDevices('videoinput');
-
-        navigator.mediaDevices.addEventListener('devicechange', async () => {
-          try {
-            const audioDevices = await getDevices('audioinput');
-            const videoDevices = await getDevices('videoinput');
-            setAudioList(audioDevices);
-            setVideoList(videoDevices);
-          } catch (err) {
-            console.log(err);
-          }
-        });
-
-        const constrains = { audio: true, video: true };
-        const mediaStream = await getMedia(constrains);
-
         const connection = new RTCPeerConnection({
           iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
         });
@@ -88,15 +67,13 @@ const VideoConnectionContext = ({ children }: { children: React.ReactNode }) => 
         connection.addEventListener('track', handleTrack);
         peerConnection.current = connection;
         stream.current = mediaStream;
-        setAudioList(audioDevices);
-        setVideoList(videoDevices);
       } catch (err) {
         console.log(err);
       }
     };
 
     videoInit();
-  }, [name, socket, setAlert]);
+  }, [name, socket]);
 
   return (
     <VideoConnection.Provider

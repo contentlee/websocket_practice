@@ -1,3 +1,5 @@
-import SocketService from "./socket";
+import ChatService from "./chat";
+import RoomService from "./room";
+import UserService from "./user";
 
-export { SocketService };
+export { ChatService, RoomService, UserService };

@@ -1,9 +1,6 @@
 import { createContext, useEffect, useRef, useState } from 'react';
 import { useOutletContext, useParams } from 'react-router';
-import { useRecoilState } from 'recoil';
 import { Socket } from 'socket.io-client';
-
-import { alertAtom } from '@atoms/stateAtom';
 
 import { getDevices, getMedia } from '../helpers/connection';
 
@@ -29,8 +26,6 @@ const CallConnectionContext = ({ children }: { children: React.ReactNode }) => {
   const { name } = useParams();
 
   // common UI
-  const [_, setAlert] = useRecoilState(alertAtom);
-
   const stream = useRef<MediaStream | null>(null);
 
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -83,7 +78,7 @@ const CallConnectionContext = ({ children }: { children: React.ReactNode }) => {
       }
     };
     audioInit();
-  }, [name, socket, setAlert]);
+  }, [name, socket]);
 
   return (
     <CallConnection.Provider

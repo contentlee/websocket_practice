@@ -11,7 +11,7 @@ const LoginPage = () => {
         alignItems: 'center',
       }}
     >
-      <LoginContainer></LoginContainer>
+      <LoginContainer />
     </PageLayout>
   );
 };

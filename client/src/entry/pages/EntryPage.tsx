@@ -1,7 +1,8 @@
-import { PageLayout } from '@components';
+import { Circle, PageLayout, Title } from '@components';
 
-import { CreateRoomModal, RoomListContainer } from '../containers';
-import { Title } from '../components';
+import EntryContainer from '../containers';
+
+import { palette } from '@utils/palette';
 
 const EntryPage = () => {
   return (
@@ -14,9 +15,11 @@ const EntryPage = () => {
         width: '100%',
       }}
     >
-      <Title>활성화된 채팅방</Title>
-      <RoomListContainer></RoomListContainer>
-      <CreateRoomModal />
+      <Title>
+        <div>활성화된 채팅방</div>
+        <Circle css={{ background: palette.point.green }} />
+      </Title>
+      <EntryContainer />
     </PageLayout>
   );
 };

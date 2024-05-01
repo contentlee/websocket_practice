@@ -8,7 +8,6 @@
       "@call": ["src/call/pages"],
       "@chat": ["src/chat/pages"],
       "@components": ["src/common/components"],
-      "@containers": ["src/common/containers"],
       "@entry": ["src/entry/pages"],
       "@hooks": ["src/hooks"],
       "@login": ["src/login/pages"],

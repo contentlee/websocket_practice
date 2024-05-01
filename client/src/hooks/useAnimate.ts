@@ -1,49 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, RefObject } from 'react';
 
 type AnimationType = 'fadeIn' | 'fadeOut' | 'alert' | 'showAlarm' | 'closeAlarm';
-type Animation = [AnimationType, () => void, number];
 
-type Return = [
-  (ref: React.MutableRefObject<HTMLElement>) => void,
-  (type: AnimationType, callback?: () => void, time?: number) => void,
-];
+interface Props {
+  type: AnimationType;
+  time?: number;
+}
 
-const useAnimate = (): Return => {
-  const [ref, setRef] = useState<React.MutableRefObject<HTMLElement>>();
-
-  const handleChangeRef = (ref: React.MutableRefObject<HTMLElement>) => {
-    setRef(ref);
+const useAnimate = ({ type, time = 2000 }: Props) => {
+  const [animation, setAnimation] = useState({ ...ANIMATE_TYPE[type], animationDuration: time });
+  const handleAnimation = (newType: AnimationType, newTime?: number) => {
+    setAnimation({ ...ANIMATE_TYPE[newType], animationDuration: newTime ? newTime : time });
   };
 
-  const [animation, setAnimation] = useState<Animation>();
-
-  const handleChangeAnimationState = (type: AnimationType, callback = () => {}, time = 300) => {
-    setAnimation([type, callback, time]);
-  };
-
-  const handleChangeElementStyle = (type: AnimationType, time: number = 300) => {
-    const keyframe: PropertyIndexedKeyframes = ANIMATE_TYPE[type];
-    const timeline: KeyframeAnimationOptions = {
-      duration: time - 100 / 1000,
-      fill: 'forwards',
-      easing: 'ease-out',
-    };
-    if (!!ref!.current) ref!.current.animate(keyframe, timeline);
-  };
-
-  useEffect(() => {
-    if (ref && animation) {
-      const [type, callback, time] = animation;
-      handleChangeElementStyle(type, time);
-
-      const timer = setTimeout(callback, time);
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [ref, animation]);
-
-  return [handleChangeRef, handleChangeAnimationState];
+  return [animation, handleAnimation];
 };
 
 const ANIMATE_TYPE = {

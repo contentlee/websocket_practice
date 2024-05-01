@@ -1,12 +1,10 @@
-import { useAnimate } from '@hooks';
-import { HTMLAttributes, ReactNode, useEffect, useRef } from 'react';
+import { HTMLAttributes, ReactNode } from 'react';
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
 }
 
 const PageLayout = ({ children, ...props }: Props) => {
-  // const ref = useRef<HTMLDivElement>(null)
   // const [setRef ,setAnimation] = useAnimate();
 
   // useEffect(() => {
@@ -18,7 +16,6 @@ const PageLayout = ({ children, ...props }: Props) => {
   // }, []);
   return (
     <div
-      // ref={ref}
       css={{
         width: '100%',
         minWidth: '310px',

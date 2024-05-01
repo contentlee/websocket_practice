@@ -13,7 +13,7 @@ function App() {
   const userInfo = useRecoilValue(userAtom);
   return (
     <Routes>
-      <Route element={<CommonPage></CommonPage>}>
+      <Route element={<CommonPage />}>
         {userInfo.name ? (
           <>
             <Route path="/" element={<EntryPage />}></Route>

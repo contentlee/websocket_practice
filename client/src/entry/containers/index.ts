@@ -1,5 +1,3 @@
-import CreateRoomModal from './CreateRoomModal';
-import EmptyListContainer from './EmptyListContainer';
-import RoomListContainer from './RoomListContainer';
+import EntryContainer from './EntryContainer';
 
-export { CreateRoomModal, EmptyListContainer, RoomListContainer };
+export default EntryContainer;

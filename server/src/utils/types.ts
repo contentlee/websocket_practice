@@ -20,10 +20,3 @@ export interface RoomInfo {
   attendee: { user: string; msg_index: number }[];
   max_length: number;
 }
-
-// export interface RoomInfo {
-//   [index: string]: {
-//     maxLength: number;
-//     notification: string;
-//   };
-// }
