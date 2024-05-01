@@ -25,8 +25,9 @@ class RoomService extends BaseService {
     return {
       room: {
         name,
-        attendee: room.attendee,
+        attendee: room.attendee.map((v) => v.user),
         chat,
+        max_length: room.max_length,
       },
       startIdx,
     };
@@ -36,7 +37,7 @@ class RoomService extends BaseService {
     const rooms = await this.roomModel.getRooms();
 
     return rooms.map(({ name, attendee, max_length }) => {
-      return { name, attendee, max_length };
+      return { name, attendee: attendee.map((v) => v.user), max_length };
     });
   }
 

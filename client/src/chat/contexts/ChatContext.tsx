@@ -1,10 +1,12 @@
-import { createContext, useEffect, useState } from 'react';
-import { useNavigate, useOutletContext, useParams } from 'react-router';
+import { createContext, useCallback, useEffect, useState } from 'react';
+
+import { useNavigate, useParams } from 'react-router';
+
 import { useRecoilValue } from 'recoil';
-import { Socket } from 'socket.io-client';
-import { produce } from 'immer';
 
 import { userAtom } from '@atoms/userAtom';
+import { chatSocket, roomSocket } from '@socket';
+import { Room } from 'src/socket/room';
 
 export const TitleContext = createContext({
   name: '익명',
@@ -17,13 +19,6 @@ export interface Msg {
   msg: string;
   user: string;
 }
-
-interface Room {
-  name: string;
-  attendee: { user: string; msg_index: number }[];
-  chat: Msg[];
-}
-
 export const MsgContext = createContext<Msg[]>([]);
 
 export const AttendeeContext = createContext<Room['attendee']>([]);
@@ -37,47 +32,38 @@ export const HandlerContext = createContext({
 
 const ChatContext = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
-  const { socket } = useOutletContext<{ socket: Socket }>();
-
   const { name: roomName } = useParams();
 
-  const userInfo = useRecoilValue(userAtom);
+  const { name: myName } = useRecoilValue(userAtom);
 
   const [title, setTitle] = useState({ name: '익명', length: 0 });
   const [msgs, setMsgs] = useState<Msg[]>([]);
-  const [attendee, setAttendee] = useState<Room['attendee']>([]);
+  const [attendee, setAttendee] = useState<string[]>([]);
   const [idx, setIdx] = useState(0);
 
-  const handleAddMsg = (msg: Msg) => setMsgs([...msgs, msg]);
+  const handleAddMsg = useCallback((msg: Msg) => setMsgs([...msgs, msg]), [msgs]);
   const handleChangeIdx = (idx: number) => setIdx(idx);
 
   useEffect(() => {
-    const { name: myName } = userInfo;
+    const getRoom = (room: Room, startIndx: number) => {
+      setTitle({ name: roomName!, length: room.attendee.length });
+      setAttendee(room.attendee);
+      setIdx(startIndx);
 
-    if (socket && roomName) {
-      socket.emit('get_room', roomName, myName, (room: Room, startIndx: number) => {
-        setTitle({ name: roomName, length: room.attendee.length });
-        setAttendee(room.attendee);
-        setIdx(startIndx);
-
-        const chats = room.chat.map((room) => {
-          if (room.type === 'message') {
-            room.type = room.user === myName ? 'from' : 'to';
-          }
-          return room;
-        });
-        setMsgs(chats);
+      const chats = room.chat?.map((room) => {
+        if (room.type === 'message') {
+          room.type = room.user === myName ? 'from' : 'to';
+        }
+        return room;
       });
-    }
+      if (chats) setMsgs(chats);
+    };
 
     const welcome = (user: string) => {
-      setTitle((prev) =>
-        produce(prev, (draft) => {
-          draft.length++;
-          return draft;
-        }),
-      );
-      setAttendee([...attendee, { user, msg_index: 0 }]);
+      setTitle((prev) => {
+        return { name: prev.name, length: prev.length + 1 };
+      });
+      setAttendee([...attendee, user]);
       handleAddMsg({
         type: 'welcome',
         user,
@@ -85,23 +71,18 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
         date: new Date(),
       });
     };
-    socket.on('welcome_room', welcome);
 
     const leave = (user: string) => {
-      setTitle((prev) =>
-        produce(prev, (draft) => {
-          draft.length--;
-          return draft;
-        }),
-      );
+      setTitle((prev) => {
+        return { name: prev.name, length: prev.length - 1 };
+      });
 
-      setAttendee((prev) =>
-        produce(prev, (draft) => {
-          const index = draft.findIndex((v) => v.user === user);
-          draft.splice(index, 1);
-          return draft;
-        }),
-      );
+      setAttendee((prev) => {
+        const tmp = [...prev];
+        const index = prev.findIndex((name) => name === user);
+        tmp.splice(index, 1);
+        return tmp;
+      });
       handleAddMsg({
         type: 'bye',
         user,
@@ -109,19 +90,22 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
         date: new Date(),
       });
     };
-    socket.on('leave_room', leave);
 
     const newMessage = (user: string, msg: string) => {
       handleAddMsg({ type: 'to', user, msg, date: new Date() });
     };
-    socket.on('new_message', newMessage);
+
+    roomSocket.getRoom(roomName!, myName, getRoom);
+    chatSocket.welcomeRoom(welcome).on();
+    chatSocket.byeRoom(leave).on();
+    chatSocket.receiveNewMessage(newMessage).on();
 
     return () => {
-      socket.off('welcome_room', welcome);
-      socket.off('leave_room', leave);
-      socket.off('new_message', newMessage);
+      chatSocket.welcomeRoom(welcome).off();
+      chatSocket.byeRoom(leave).off();
+      chatSocket.receiveNewMessage(newMessage).off();
     };
-  }, [socket, userInfo, roomName, attendee, navigate]);
+  }, [myName, roomName, attendee, navigate, handleAddMsg]);
 
   return (
     <TitleContext.Provider value={title}>

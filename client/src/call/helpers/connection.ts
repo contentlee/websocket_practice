@@ -1,5 +1,5 @@
 export const getMedia = async (constrains: MediaStreamConstraints) => {
-  return navigator.mediaDevices.getUserMedia(constrains);
+  return await navigator.mediaDevices.getUserMedia(constrains);
 };
 
 export const getDevices = async (type: MediaDeviceKind) => {

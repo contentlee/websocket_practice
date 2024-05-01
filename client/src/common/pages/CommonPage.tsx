@@ -1,24 +1,24 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router';
-import { io } from 'socket.io-client';
 
 import { Alarm, Alert } from '../components';
 import { useAlert } from '@hooks';
 
+import { socket, loginSocket } from '@socket';
+
 const CommonPage = () => {
   const navigate = useNavigate();
   const { addAlert } = useAlert();
-
-  const socket = useRef(io('ws://192.168.0.122:8080'));
 
   useEffect(() => {
     const needLogin = () => {
       addAlert('error', '로그인이 필요합니다.');
       navigate('/login');
     };
-    socket.current.on('need_login', needLogin);
+    loginSocket.needLogin(needLogin).on();
+
     return () => {
-      socket.current.off('need_login', needLogin);
+      loginSocket.needLogin(needLogin).off();
     };
   }, []);
 
@@ -33,8 +33,8 @@ const CommonPage = () => {
       }}
     >
       <Alert />
-      <Alarm socket={socket.current} />
-      <Outlet context={{ socket: socket.current }} />
+      <Alarm socket={socket.get()} />
+      <Outlet />
     </div>
   );
 };

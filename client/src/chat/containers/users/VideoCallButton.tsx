@@ -1,6 +1,7 @@
-import { Socket } from 'socket.io-client';
-import { useNavigate, useOutletContext } from 'react-router';
-import { useRecoilValue, useResetRecoilState } from 'recoil';
+import { useNavigate } from 'react-router';
+import { useRecoilValue } from 'recoil';
+
+import { chatSocket } from '@socket';
 
 import { userAtom } from '@atoms/userAtom';
 
@@ -15,17 +16,15 @@ interface Props {
 const VideoCallButton = ({ user }: Props) => {
   const navigate = useNavigate();
 
-  const { socket } = useOutletContext<{ socket: Socket }>();
-
-  const { name: myName } = useRecoilValue(userAtom);
+  const { name: room_name } = useRecoilValue(userAtom);
 
   const handleClickVideoCall = (e: React.MouseEvent) => {
     e.preventDefault();
 
     const callback = () => {
-      navigate(`/video/${myName}`);
+      navigate(`/video/${room_name}`);
     };
-    socket.emit('require_video_call', user, myName, callback);
+    chatSocket.requireVideoCall(user, room_name, callback);
   };
 
   return <Icon src={VideoCallIcon} size="small" onClick={handleClickVideoCall} />;

@@ -1,4 +1,3 @@
-import { produce } from 'immer';
 import { atom } from 'recoil';
 
 interface User {
@@ -12,8 +11,6 @@ export const userAtom = atom<User>({
   },
 });
 
-export const changeUser = (value: string) => (prev: User) =>
-  produce(prev, (draft) => {
-    draft.name = value;
-    return draft;
-  });
+export const changeUser = (value: string) => (prev: User) => {
+  return { ...prev, name: value };
+};

@@ -1,30 +1,27 @@
-import { Button } from '@components';
 import { HTMLAttributes } from 'react';
-import { useNavigate, useParams } from 'react-router';
-import { Socket } from 'socket.io-client';
 
-interface Props extends HTMLAttributes<HTMLButtonElement> {
-  socket: Socket;
-  peerConnection: React.MutableRefObject<RTCPeerConnection | null>;
+import { Button } from '@components';
+import { callSocket } from '@socket';
+
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  roomName: string;
+  userName: string;
+  exitCall: () => void;
 }
 
-const ExitButton = ({ socket, peerConnection, ...props }: Props) => {
-  const navigate = useNavigate();
-  const { name } = useParams();
-
+const ExitButton = ({ roomName, userName, exitCall, ...props }: Props) => {
   const handleClickExit = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    socket.emit('end_call', name, () => {
-      peerConnection.current?.close();
-      navigate(-1);
-    });
+    callSocket.finishCall(roomName, userName, exitCall);
   };
 
   return (
-    <Button {...props} color="secondary" onClick={handleClickExit}>
-      나가기
-    </Button>
+    <div {...props}>
+      <Button css={{ width: '100%' }} color="secondary" onClick={handleClickExit}>
+        나가기
+      </Button>
+    </div>
   );
 };
 

@@ -16,12 +16,14 @@ const Alarm = ({ socket }: Props) => {
   const [type, setType] = useState<'call' | 'video'>('call');
   const [name, setName] = useState('');
 
-  const permitCall = () => {
+  const requirePermitCall = () => {
+    if (!isOpened) return;
     setOpened(false);
     navigate(`/${type}/${name}`);
   };
 
-  const cancelCall = () => {
+  const requireCancelCall = () => {
+    if (!isOpened) return;
     const closeAlarm = () => setOpened(false);
     socket.emit('cancel_call', name, closeAlarm);
   };
@@ -41,9 +43,15 @@ const Alarm = ({ socket }: Props) => {
     };
     socket.on('require_video_call', requireVideoCall);
 
+    const cancelCall = () => {
+      setOpened(false);
+    };
+    socket.on('cancel_call', cancelCall);
+
     return () => {
       socket.off('require_call', requireCall);
       socket.off('require_video_call', requireVideoCall);
+      socket.off('cancel_call', cancelCall);
     };
   }, [socket]);
 
@@ -51,8 +59,8 @@ const Alarm = ({ socket }: Props) => {
     isOpened &&
     createPortal(
       <AlarmLayout>
-        <PermitButton type={type} permitCall={permitCall} />
-        <CancelButton type={type} cancelCall={cancelCall} />
+        <PermitButton type={type} permitCall={requirePermitCall} />
+        <CancelButton type={type} cancelCall={requireCancelCall} />
       </AlarmLayout>,
       document.body,
       'alarm',

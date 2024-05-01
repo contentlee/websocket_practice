@@ -1,40 +1,45 @@
-import { HTMLAttributes, useContext } from 'react';
-import { useOutletContext, useParams } from 'react-router';
-import { Socket } from 'socket.io-client';
+import { HTMLAttributes, ReactNode, useContext } from 'react';
+import { useParams } from 'react-router';
 import { useRecoilValue } from 'recoil';
+
+import { chatSocket } from '@socket';
 
 import { userAtom } from '@atoms/userAtom';
 
 import { palette } from '@utils/palette';
 
-import { Button } from '@components';
-import { InputMsg } from '.';
 import { HandlerContext } from '../../contexts';
 
-interface Props extends HTMLAttributes<HTMLFormElement> {}
+interface Props extends HTMLAttributes<HTMLFormElement> {
+  children: ReactNode;
+}
 
-const SendForm = ({ ...props }: Props) => {
-  const { socket } = useOutletContext<{ socket: Socket }>();
+// TODO : 입력창 세로중앙정렬
+// TODO : 메세지 보낸 후 TextArea 크기 원상태 복구
+// TODO :
+const SendForm = ({ children, ...props }: Props) => {
+  // roomName
+  const { name: room_name } = useParams();
 
-  const { name } = useParams();
-
-  const { name: myName } = useRecoilValue(userAtom);
+  const { name: user_name } = useRecoilValue(userAtom);
 
   const { handleAddMsg } = useContext(HandlerContext);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const target = e.currentTarget[0] as HTMLInputElement;
-    if (!target.value) return;
-    socket.emit('new_message', target.value, name, myName, () => {
+    const message = target.value;
+    if (!message) return;
+    const callback = () => {
       handleAddMsg({
         type: 'from',
         date: new Date(),
-        msg: target.value,
-        user: myName,
+        msg: message,
+        user: user_name,
       });
       target.value = '';
-    });
+    };
+    chatSocket.sendNewMessage(message, room_name!, user_name, callback);
   };
 
   return (
@@ -64,8 +69,7 @@ const SendForm = ({ ...props }: Props) => {
         onSubmit={handleSubmit}
         {...props}
       >
-        <InputMsg />
-        <Button type="submit">보내기</Button>
+        {children}
       </form>
     </div>
   );

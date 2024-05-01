@@ -35,9 +35,9 @@ class CallContoller extends BaseController {
     done();
   };
 
-  public endCall = (fromUserName: string, done: () => void) => {
+  public endCall = (roomName: string, fromUserName: string, done: () => void) => {
     this.socket.leave(fromUserName);
-    this.socket.to(fromUserName).emit("end_call");
+    this.socket.to(roomName).emit("end_call");
     done();
   };
 }

@@ -1,7 +1,8 @@
+import MessageInput from './MessageInput';
+
+export default MessageInput;
+
 import SendForm from './SendForm';
-
-export default SendForm;
-
 import InputMsg from './InputMsg';
 
-export { InputMsg };
+export { InputMsg, SendForm };

@@ -29,7 +29,6 @@ module.exports = {
           { pattern: 'react-router', group: 'builtin', position: 'before' },
           { pattern: 'react-router-dom', group: 'builtin', position: 'before' },
           { pattern: 'recoil', group: 'external', position: 'before' },
-          { pattern: 'immer', group: 'external', position: 'before' },
           { pattern: 'socket.io-client', group: 'external', position: 'before' },
           { pattern: '@asset/**', group: 'object', position: 'before' },
           { pattern: '@atoms/**', group: 'internal' },

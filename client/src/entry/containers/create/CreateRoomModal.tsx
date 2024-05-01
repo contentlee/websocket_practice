@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { Socket } from 'socket.io-client';
+
+import { roomSocket } from '@socket';
 
 import { palette } from '@utils/palette';
 
@@ -16,24 +16,22 @@ interface Props {
 const CreateRoomModal = ({ closeModal }: Props) => {
   const { addAlert } = useAlert();
 
-  const { socket } = useOutletContext<{ socket: Socket }>();
-
   useEffect(() => {
     const duplicatedName = () => {
       addAlert('error', '중복된 채팅방이 존재합니다.');
     };
-    socket.on('duplicated_name', duplicatedName);
+    roomSocket.duplicatedName(duplicatedName).on();
 
-    const wrong_max = () => {
+    const wrongMax = () => {
       addAlert('error', '최대값이 잘못 설정되었습니다.');
     };
-    socket.on('wrong_max', wrong_max);
+    roomSocket.wrongMax(wrongMax).on();
 
     return () => {
-      socket.off('duplicated_name', duplicatedName);
-      socket.off('wrong_max', wrong_max);
+      roomSocket.duplicatedName(duplicatedName).off();
+      roomSocket.wrongMax(wrongMax).off();
     };
-  }, [addAlert, socket]);
+  }, [addAlert, roomSocket]);
 
   return (
     <CreateForm closeModal={closeModal}>

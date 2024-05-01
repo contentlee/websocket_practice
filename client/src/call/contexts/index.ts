@@ -1,4 +1,5 @@
-import CallConnectionContext, { CallConnection } from './CallConnectionContext';
-import VideoConnectionContext, { VideoConnection } from './VideoConnectionContext';
+import ConnectionContext from './ConnectionContext';
+export default ConnectionContext;
 
-export { CallConnection, CallConnectionContext, VideoConnection, VideoConnectionContext };
+import { PeerConnectionContext, DevicesContext } from './ConnectionContext';
+export { PeerConnectionContext, DevicesContext };

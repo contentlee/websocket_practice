@@ -1,38 +1,34 @@
+import { HTMLAttributes, useEffect, useState } from 'react';
+
 import VideoOnIcon from '@assets/videocam_on_icon.svg';
 import VideoOffIcon from '@assets/videocam_off_icon.svg';
 
 import { Button, Icon } from '@components';
-import { ButtonHTMLAttributes, MutableRefObject, RefObject, useEffect, useState } from 'react';
 
-interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
-  videoRef: RefObject<HTMLVideoElement>;
-  stream: MutableRefObject<MediaStream | null>;
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  stream: MediaStream | null;
+  toggleStream: (type: 'audio' | 'video') => boolean;
 }
 
-const VideoToggleButton = ({ videoRef, stream }: Props) => {
+const VideoToggleButton = ({ stream, toggleStream, ...props }: Props) => {
   const [onVideo, setOnVideo] = useState(false);
 
   const handleClickVideoToggle = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (videoRef.current?.srcObject) {
-      (videoRef.current.srcObject as MediaStream).getVideoTracks().forEach((track) => {
-        track.enabled = !track.enabled;
-        setOnVideo(track.enabled);
-      });
-    }
-    stream.current?.getVideoTracks().forEach((track) => {
-      track.enabled = !track.enabled;
-      setOnVideo(track.enabled);
-    });
+    const flag = toggleStream('video');
+    setOnVideo(flag);
   };
 
   useEffect(() => {
-    setOnVideo(true);
+    const enabled = stream?.getVideoTracks()[0].enabled;
+    if (enabled) setOnVideo(enabled);
   }, [stream]);
   return (
-    <Button onClick={handleClickVideoToggle}>
-      <Icon src={onVideo ? VideoOnIcon : VideoOffIcon}></Icon>
-    </Button>
+    <div {...props}>
+      <Button css={{ width: '100%' }} onClick={handleClickVideoToggle}>
+        <Icon src={onVideo ? VideoOnIcon : VideoOffIcon}></Icon>
+      </Button>
+    </div>
   );
 };
 

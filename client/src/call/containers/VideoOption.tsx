@@ -1,16 +1,18 @@
 import { useContext } from 'react';
-import { useOutletContext } from 'react-router';
-import { Socket } from 'socket.io-client';
+import { useParams } from 'react-router';
+import { useRecoilValue } from 'recoil';
 
-import { VideoConnection } from '../contexts';
-
-import { AudioToggleButton, ExitButton, VideoToggleButton } from '../components';
-import VideoSelect from '../components/VideoSelect';
+import { DevicesContext, PeerConnectionContext } from '../contexts';
+import { AudioToggleButton, ExitButton, VideoSelect, VideoToggleButton } from '../components';
+import { userAtom } from '@atoms/userAtom';
 
 const VideoOption = () => {
-  const { socket } = useOutletContext<{ socket: Socket }>();
+  const { name: roomName } = useParams();
+  const { name: userName } = useRecoilValue(userAtom);
 
-  const { peerConnection, stream, audioList, myVideoRef, videoList } = useContext(VideoConnection);
+  const { peerConnection, stream, updateStream, toggleStream, exitCall } =
+    useContext(PeerConnectionContext);
+  const { audioList, videoList } = useContext(DevicesContext);
 
   return (
     <div
@@ -32,20 +34,25 @@ const VideoOption = () => {
         peerConnection={peerConnection}
         stream={stream}
         list={audioList}
-        ref={myVideoRef}
         type="audio"
+        updateStream={updateStream}
       />
       <VideoSelect
         peerConnection={peerConnection}
         stream={stream}
         list={videoList}
-        ref={myVideoRef}
         type="video"
+        updateStream={updateStream}
       />
       <div css={{ display: 'flex', width: '100%' }}>
-        <VideoToggleButton videoRef={myVideoRef} stream={stream} css={{ flex: 1 / 3 }} />
-        <AudioToggleButton stream={stream} css={{ flex: 1 / 3 }} />
-        <ExitButton css={{ flex: 1 / 3 }} peerConnection={peerConnection} socket={socket} />
+        <VideoToggleButton css={{ flex: 1 / 3 }} stream={stream} toggleStream={toggleStream} />
+        <AudioToggleButton css={{ flex: 1 / 3 }} stream={stream} toggleStream={toggleStream} />
+        <ExitButton
+          css={{ flex: 1 / 3 }}
+          roomName={roomName!}
+          userName={userName}
+          exitCall={exitCall}
+        />
       </div>
     </div>
   );

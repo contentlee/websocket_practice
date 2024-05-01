@@ -1,7 +1,7 @@
 import { useContext, useEffect } from 'react';
-import { useOutletContext } from 'react-router';
 import { useRecoilValue } from 'recoil';
-import { Socket } from 'socket.io-client';
+
+import { chatSocket } from '@socket';
 
 import { palette } from '@utils/palette';
 import { useAlert } from '@hooks';
@@ -13,20 +13,18 @@ import { UserElement } from '.';
 const UserList = () => {
   const { addAlert } = useAlert();
 
-  const { socket } = useOutletContext<{ socket: Socket }>();
-
   const { name: myName } = useRecoilValue(userAtom);
 
   const attendee = useContext(AttendeeContext);
 
   useEffect(() => {
     const notFoundUser = () => addAlert('error', '사용자가 접속하지 않은 상태입니다.');
-    socket.on('not_found_user', notFoundUser);
+    chatSocket.noFoundUser(notFoundUser).on();
 
     return () => {
-      socket.off('not_found_user', notFoundUser);
+      chatSocket.noFoundUser(notFoundUser).off();
     };
-  }, [addAlert, socket]);
+  }, [addAlert, chatSocket]);
 
   return (
     <div
@@ -40,7 +38,7 @@ const UserList = () => {
         background: palette.background,
       }}
     >
-      {attendee.map(({ user }) => myName !== user && <UserElement key={user} user={user} />)}
+      {attendee.map((name) => myName !== name && <UserElement key={name} user={name} />)}
     </div>
   );
 };

@@ -1,62 +1,21 @@
-import { useEffect, useContext } from 'react';
-import { useOutletContext } from 'react-router';
-import { Socket } from 'socket.io-client';
+import { useEffect, useContext, useRef } from 'react';
 
-import { CallConnection } from '../contexts';
-import CallOption from './CallOption';
-import { useCallConnect, useRTCConnect } from '@hooks';
-import { CallState } from '../components';
+import { CallOption } from '.';
+import { CallLayout, CallState } from '../components';
+import { DevicesContext, PeerConnectionContext } from '../contexts';
 
 const CallContainer = () => {
-  const { socket } = useOutletContext<{ socket: Socket }>();
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  const { peerConnection, audioList, audioRef } = useContext(CallConnection);
-  const { permitCall, cancelCall, endCall } = useCallConnect({ peerConnection, socket });
-  const { callState, receiveAnswer, receiveOffer, icecandidate } = useRTCConnect({
-    peerConnection,
-    socket,
-  });
+  const { callState, peerConnection, registerTrackEvent } = useContext(PeerConnectionContext);
+  const { audioList } = useContext(DevicesContext);
 
   useEffect(() => {
-    // when partner permit your call (1)
-    socket.on('permit_call', permitCall);
-
-    // receive partner's offer (3)
-    socket.on('offer', receiveOffer);
-
-    // receive partner's answer (5)
-    socket.on('answer', receiveAnswer);
-
-    socket.on('icecandidate', icecandidate);
-
-    // when partner reject your call
-    socket.on('cancel_call', cancelCall);
-
-    // when partner end call
-    socket.on('end_call', endCall);
-
-    return () => {
-      socket.off('cancel_call', cancelCall);
-      socket.off('permit_call', permitCall);
-      socket.off('offer', receiveOffer);
-      socket.off('answer', receiveAnswer);
-      socket.off('icecandidate', icecandidate);
-      socket.off('end_call', endCall);
-    };
-  }, [socket, peerConnection]);
+    if (audioRef.current) registerTrackEvent(audioRef.current);
+  }, [audioRef.current, peerConnection]);
 
   return (
-    <div
-      css={{
-        position: 'relative',
-        display: 'flex',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-      }}
-    >
+    <CallLayout>
       <audio
         autoPlay
         playsInline
@@ -66,20 +25,10 @@ const CallContainer = () => {
           display: 'none',
         }}
       />
-      <div
-        css={{
-          position: 'absolute',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          height: '100%',
-        }}
-      >
-        <CallState state={audioList.length ? 'need_mic' : callState} />
-      </div>
+
+      <CallState state={!audioList.length ? 'need_mic' : callState} />
       <CallOption />
-    </div>
+    </CallLayout>
   );
 };
 

@@ -1,41 +1,38 @@
-import { MutableRefObject, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+
 import { Select } from '@components';
-import { getMedia } from '../helpers/connection';
+import { UpdateProps } from '@hooks';
 
 interface Props {
-  peerConnection: MutableRefObject<RTCPeerConnection | null>;
-  stream: MutableRefObject<MediaStream | null>;
   audioList: MediaDeviceInfo[];
+  stream: MediaStream | null;
+  updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack[]>;
 }
-const AudioSelect = ({ peerConnection, stream, audioList }: Props) => {
+const AudioSelect = ({ audioList, stream, updateStream }: Props) => {
   const [selectedAudio, setSelectedAudio] = useState<MediaStreamTrack>();
 
   const handleChangeAudio = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
 
     const value = e.target.value;
-    const mediaStream = await getMedia({ audio: { deviceId: value } });
-
-    setSelectedAudio(mediaStream.getTracks()[0]);
-
-    const audioSender = peerConnection.current
-      ?.getSenders()
-      .find((sender) => sender.track?.kind === 'audio');
-
-    await audioSender?.replaceTrack(mediaStream.getTracks()[0]);
-
-    mediaStream.getAudioTracks().forEach((track) => {
-      track.enabled = !track.enabled;
+    const constrains = { audio: { deviceId: value } };
+    const tracks = await updateStream({
+      type: 'audio',
+      constrains,
     });
-
-    stream.current = mediaStream;
+    setSelectedAudio(tracks[0]);
   };
-
   useEffect(() => {
-    setSelectedAudio(stream.current?.getTracks()[0]);
-  }, [stream]);
+    const track = stream?.getTracks();
+    if (track) setSelectedAudio(track[0]);
+  }, []);
   return (
-    <Select defaultValue={selectedAudio?.id} option={audioList} onChange={handleChangeAudio} />
+    <Select
+      css={{ border: 'none' }}
+      defaultValue={selectedAudio?.id}
+      option={audioList}
+      onChange={handleChangeAudio}
+    />
   );
 };
 

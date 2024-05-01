@@ -2,7 +2,7 @@ import { useContext } from 'react';
 
 import { palette } from '@utils/palette';
 
-import { TitleContext } from '../../contexts';
+import { AttendeeContext, TitleContext } from '../../contexts';
 
 interface Props {
   openModal: () => void;
@@ -10,10 +10,11 @@ interface Props {
 
 const RoomTitle = ({ openModal }: Props) => {
   const title = useContext(TitleContext);
+  const attendee = useContext(AttendeeContext);
 
   const handleClickTitle = (e: React.MouseEvent) => {
     e.preventDefault();
-    openModal();
+    if (attendee.length >= 2) openModal();
   };
 
   return (

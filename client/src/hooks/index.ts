@@ -1,8 +1,10 @@
 import useAlert from './useAlert';
 import useAnimate from './useAnimate';
 
-import useCallConnect from './useCallConnect';
-import useGetVideo from './useGetVideo';
-import useRTCConnect from './useRTCConnect';
+import useGetDevices from './useGetDevices';
+import usePeerConnect from './usePeerConnection';
 
-export { useAlert, useAnimate, useCallConnect, useGetVideo, useRTCConnect };
+export { useAlert, useAnimate, useGetDevices, usePeerConnect };
+
+import { UpdateProps } from './usePeerConnection';
+export type { UpdateProps };

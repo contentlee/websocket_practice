@@ -1,14 +1,19 @@
-import { AudioSelect, AudioToggleButton, ExitButton } from '../components';
-import { useOutletContext } from 'react-router';
-import { Socket } from 'socket.io-client';
 import { useContext } from 'react';
-import { CallConnection } from '../contexts';
+import { useParams } from 'react-router';
+import { useRecoilValue } from 'recoil';
+
+import { AudioSelect, AudioToggleButton, ExitButton } from '../components';
+import { DevicesContext, PeerConnectionContext } from '../contexts';
+
+import { userAtom } from '@atoms/userAtom';
+import { palette } from '@utils/palette';
 
 const CallOption = () => {
-  const { socket } = useOutletContext<{ socket: Socket }>();
+  const { name: roomName } = useParams();
+  const { name: userName } = useRecoilValue(userAtom);
 
-  const { peerConnection, audioList, stream } = useContext(CallConnection);
-
+  const { stream, updateStream, toggleStream, exitCall } = useContext(PeerConnectionContext);
+  const { audioList } = useContext(DevicesContext);
   return (
     <div
       css={{
@@ -23,12 +28,18 @@ const CallOption = () => {
         maxWidth: '390px',
         minWidth: '310px',
         boxSizing: 'border-box',
+        border: '1.5px solid' + palette.main.blk,
       }}
     >
-      <AudioSelect peerConnection={peerConnection} stream={stream} audioList={audioList} />
-      <div css={{ display: 'flex', width: '100%' }}>
-        <AudioToggleButton css={{ flex: 1 / 2 }} stream={stream} />
-        <ExitButton css={{ flex: 1 / 2 }} peerConnection={peerConnection} socket={socket} />
+      <AudioSelect audioList={audioList} stream={stream} updateStream={updateStream} />
+      <div css={{ display: 'flex', width: '100%', borderTop: '1.5px solid' + palette.main.blk }}>
+        <AudioToggleButton css={{ flex: 1 / 2 }} stream={stream} toggleStream={toggleStream} />
+        <ExitButton
+          css={{ flex: 1 / 2 }}
+          roomName={roomName!}
+          userName={userName}
+          exitCall={exitCall}
+        />
       </div>
     </div>
   );

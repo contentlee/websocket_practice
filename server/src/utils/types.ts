@@ -15,8 +15,14 @@ export interface Room extends BaseRoom {
   init_msg: string;
 }
 
+export interface RoomsInfo {
+  name: string;
+  attendee: string[];
+  max_length: number;
+}
+
 export interface RoomInfo {
   name: string;
-  attendee: { user: string; msg_index: number }[];
-  max_length: number;
+  attendee: string[];
+  chat: Chat[];
 }

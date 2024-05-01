@@ -2,13 +2,13 @@ import clients from "../utils/context";
 
 class UserService {
   public login(user: string, id: string) {
-    if (clients.findUserIdByName(user)) this._refresh(id);
+    const index = clients.findUserIdxByName(user);
+    if (index > -1) this._refresh(index, id);
     else clients.pushUser(user, id);
   }
 
-  private _refresh(id: string) {
-    const index = clients.findUserIdxById(id);
-    clients.changeUserId(index, id);
+  private _refresh(index: number, id: string) {
+    clients.addUserId(index, id);
   }
 }
 

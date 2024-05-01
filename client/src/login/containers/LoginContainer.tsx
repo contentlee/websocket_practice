@@ -1,31 +1,28 @@
-import { useOutletContext } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { Socket } from 'socket.io-client';
 
 import { changeUser, userAtom } from '@atoms/userAtom';
 import { useAlert } from '@hooks';
 
 import { Input, Button } from '@components';
+import { loginSocket } from '@socket';
 
 const LoginContainer = () => {
-  const { socket } = useOutletContext<{ socket: Socket }>();
-
   const [_, setUser] = useRecoilState(userAtom);
 
   const { addAlert } = useAlert();
 
   const handleNameSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { value } = e.currentTarget[0] as HTMLInputElement;
+    const { value: id } = e.currentTarget[0] as HTMLInputElement;
 
-    if (!value) addAlert('error', '아이디를 입력해주세요!');
+    if (!id) return addAlert('error', '아이디를 입력해주세요!');
     const callback = () => {
-      setUser(changeUser(value));
+      setUser(changeUser(id));
       addAlert('success', '로그인에 성공하였습니다!');
     };
 
-    // 추후 로그인 구현 예정
-    socket.emit('login', value, callback);
+    // TODO: 로그인 구현
+    loginSocket.login(id, callback);
   };
 
   return (

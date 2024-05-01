@@ -1,7 +1,8 @@
 import { HTMLAttributes, ClassAttributes, ReactNode } from 'react';
-import { useNavigate, useOutletContext } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useRecoilValue } from 'recoil';
-import { Socket } from 'socket.io-client';
+
+import { roomSocket, socket } from '@socket';
 
 import { palette } from '@utils/palette';
 
@@ -19,9 +20,7 @@ const CreateForm = ({ closeModal, children, ...props }: Props) => {
 
   const { addAlert } = useAlert();
 
-  const { socket } = useOutletContext<{ socket: Socket }>();
-
-  const { name: userName } = useRecoilValue(userAtom);
+  const { name: user_name } = useRecoilValue(userAtom);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,7 +29,7 @@ const CreateForm = ({ closeModal, children, ...props }: Props) => {
     const value = (i: number) => (e.currentTarget[i] as HTMLInputElement).value;
 
     const name = value(0);
-    const max_length = value(1) || 100;
+    const max_length = parseInt(value(1)) || 100;
     const init_msg = value(2) || '';
 
     if (!name) return addAlert('warning', '이름이 입력되지 않았습니다.');
@@ -40,7 +39,7 @@ const CreateForm = ({ closeModal, children, ...props }: Props) => {
       addAlert('success', '채팅방 생성에 성공하였습니다!');
       navigate(`/chat/${name}`);
     };
-    socket.emit('create_room', userName, info, callback);
+    roomSocket.createRoom(user_name, info, callback);
   };
 
   const handleReset = (e: React.FormEvent<HTMLFormElement>) => {

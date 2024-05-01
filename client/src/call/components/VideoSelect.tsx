@@ -1,52 +1,56 @@
+import { useEffect, useState } from 'react';
+
 import { Select } from '@components';
-import { MutableRefObject, RefObject, useEffect, useState } from 'react';
-import { getMedia } from '../helpers/connection';
+import { UpdateProps } from '@hooks';
 
 interface Props {
-  peerConnection: MutableRefObject<RTCPeerConnection | null>;
-  stream: MutableRefObject<MediaStream | null>;
-  list: MediaDeviceInfo[];
-  ref: RefObject<HTMLVideoElement>;
+  peerConnection: RTCPeerConnection | null;
+  stream: MediaStream | null;
+  list?: MediaDeviceInfo[];
   type: 'audio' | 'video';
+  updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack[]>;
 }
 
-const VideoSelect = ({ peerConnection, stream, list, ref, type }: Props) => {
+const VideoSelect = ({ stream, list = [], type, updateStream }: Props) => {
   const [selected, setSelected] = useState<MediaStreamTrack>();
 
   const handleChangeVideo = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
 
     const value = e.target.value;
-    const mediaStream = await getMedia({
-      video: { deviceId: value },
-      audio: { deviceId: selected?.getConstraints().deviceId },
+    const constrains =
+      type === 'audio'
+        ? {
+            audio: { deviceId: value },
+            video: { deviceId: stream?.getVideoTracks()[0].getConstraints().deviceId },
+          }
+        : {
+            audio: { deviceId: stream?.getAudioTracks()[0].getConstraints().deviceId },
+            video: { deviceId: value },
+          };
+    const trakcs = await updateStream({
+      type,
+      constrains,
     });
-
-    if (ref.current) ref.current.srcObject = mediaStream;
-    setSelected(mediaStream.getVideoTracks()[0]);
-
-    const videoSender = peerConnection.current
-      ?.getSenders()
-      .find((sender) => sender.track?.kind === type);
-    await videoSender?.replaceTrack(mediaStream.getVideoTracks()[0]);
-
-    mediaStream.getVideoTracks().forEach((track) => {
-      track.enabled = !track.enabled;
-    });
-
-    mediaStream.getAudioTracks().forEach((track) => {
-      track.enabled = !track.enabled;
-    });
-
-    stream.current = mediaStream;
+    setSelected(trakcs[0]);
   };
-
   useEffect(() => {
-    if (type === 'video') setSelected(stream.current?.getVideoTracks()[0]);
-    else if (type === 'audio') setSelected(stream.current?.getAudioTracks()[0]);
-  }, [stream]);
+    if (!stream) return;
+    if (type === 'video') {
+      setSelected(stream.getVideoTracks()[0]);
+    } else if (type === 'audio') {
+      setSelected(stream.getAudioTracks()[0]);
+    }
+  }, []);
 
-  return <Select defaultValue={selected?.id} option={list} onChange={handleChangeVideo} />;
+  return (
+    <Select
+      css={{ border: 'none' }}
+      defaultValue={selected?.id}
+      option={list}
+      onChange={handleChangeVideo}
+    />
+  );
 };
 
 export default VideoSelect;

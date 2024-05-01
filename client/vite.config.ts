@@ -1,4 +1,5 @@
 import { resolve } from 'path';
+import fs from 'fs';
 
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -18,6 +19,7 @@ export default defineConfig({
       { find: '@entry', replacement: resolve(__dirname, 'src/entry/pages') },
       { find: '@hooks', replacement: resolve(__dirname, 'src/hooks') },
       { find: '@login', replacement: resolve(__dirname, 'src/login/pages') },
+      { find: '@socket', replacement: resolve(__dirname, 'src/socket') },
       { find: '@pages', replacement: resolve(__dirname, 'src/common/pages') },
       { find: '@utils', replacement: resolve(__dirname, 'src/utils') },
     ],
@@ -33,7 +35,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'ws://localhost:8080',
+        target: 'ws://192.168.0.122:8080',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''),

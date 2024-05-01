@@ -1,7 +1,8 @@
 import { HTMLAttributes } from 'react';
-import { useNavigate, useOutletContext } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useRecoilValue } from 'recoil';
-import { Socket } from 'socket.io-client';
+
+import { roomSocket, socket } from '@socket';
 
 import { userAtom } from '@atoms/userAtom';
 import { palette } from '@utils/palette';
@@ -16,15 +17,14 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 const RoomItem = ({ name, value, attendee, possible, ...props }: Props) => {
   const navigate = useNavigate();
 
-  const { socket } = useOutletContext<{ socket: Socket }>();
-
   const { name: myName } = useRecoilValue(userAtom);
 
   const handleClickRoom = (e: React.MouseEvent) => {
     e.preventDefault();
     if (attendee.includes(myName)) return navigate(`/chat/${name}`);
     const callback = () => navigate(`/chat/${name}`);
-    socket.emit('enter_room', name, myName, callback);
+
+    roomSocket.enterRooms(name, myName, callback);
   };
 
   return (

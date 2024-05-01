@@ -44,11 +44,9 @@ const COLOR_VARIANTS = {
     border: '1.5px solid transparent',
     color: palette.main.blk,
     backgroundColor: palette.background,
-    borderColor: palette.main.blk,
     '&:hover': {
       color: palette.main.wht,
       backgroundColor: palette.point.red,
-      borderColor: palette.point.red,
     },
   },
 };
