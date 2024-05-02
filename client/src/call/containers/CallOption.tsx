@@ -12,7 +12,7 @@ const CallOption = () => {
   const { name: roomName } = useParams();
   const { name: userName } = useRecoilValue(userAtom);
 
-  const { stream, updateStream, toggleStream, exitCall } = useContext(PeerConnectionContext);
+  const { myStream, updateStream, toggleStream, exitCall } = useContext(PeerConnectionContext);
   const { audioList } = useContext(DevicesContext);
   return (
     <div
@@ -31,9 +31,9 @@ const CallOption = () => {
         border: '1.5px solid' + palette.main.blk,
       }}
     >
-      <AudioSelect audioList={audioList} stream={stream} updateStream={updateStream} />
+      <AudioSelect audioList={audioList} stream={myStream} updateStream={updateStream} />
       <div css={{ display: 'flex', width: '100%', borderTop: '1.5px solid' + palette.main.blk }}>
-        <AudioToggleButton css={{ flex: 1 / 2 }} stream={stream} toggleStream={toggleStream} />
+        <AudioToggleButton css={{ flex: 1 / 2 }} stream={myStream} toggleStream={toggleStream} />
         <ExitButton
           css={{ flex: 1 / 2 }}
           roomName={roomName!}

@@ -8,7 +8,7 @@ interface Props {
   stream: MediaStream | null;
   list?: MediaDeviceInfo[];
   type: 'audio' | 'video';
-  updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack[]>;
+  updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack | null>;
 }
 
 const VideoSelect = ({ stream, list = [], type, updateStream }: Props) => {
@@ -18,22 +18,27 @@ const VideoSelect = ({ stream, list = [], type, updateStream }: Props) => {
     e.preventDefault();
 
     const value = e.target.value;
+    const notChanged =
+      type === 'audio'
+        ? stream?.getVideoTracks()[0].getConstraints()
+        : stream?.getAudioTracks()[0].getConstraints();
     const constrains =
       type === 'audio'
         ? {
             audio: { deviceId: value },
-            video: { deviceId: stream?.getVideoTracks()[0].getConstraints().deviceId },
+            video: { ...notChanged },
           }
         : {
-            audio: { deviceId: stream?.getAudioTracks()[0].getConstraints().deviceId },
+            audio: { ...notChanged },
             video: { deviceId: value },
           };
-    const trakcs = await updateStream({
+    const track = await updateStream({
       type,
       constrains,
     });
-    setSelected(trakcs[0]);
+    if (track) setSelected(track);
   };
+
   useEffect(() => {
     if (!stream) return;
     if (type === 'video') {
@@ -41,7 +46,7 @@ const VideoSelect = ({ stream, list = [], type, updateStream }: Props) => {
     } else if (type === 'audio') {
       setSelected(stream.getAudioTracks()[0]);
     }
-  }, []);
+  }, [stream]);
 
   return (
     <Select

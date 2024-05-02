@@ -1,11 +1,18 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { PeerConnectionContext } from '../contexts';
 import VideoOption from './VideoOption';
-import { CallLayout, MyVideo, PeerVideo } from '../components';
+import { CallLayout, LoadingVideo, MyVideo, PeerVideo } from '../components';
 
 const VideoContainer = () => {
-  const { stream, registerTrackEvent } = useContext(PeerConnectionContext);
+  const { myStream, peerStream, callState } = useContext(PeerConnectionContext);
+  const [peerState, setPeerState] = useState(false);
+  const [myState, setMyState] = useState(false);
+
+  useEffect(() => {
+    setPeerState(peerStream ? true : false);
+    setMyState(myStream ? true : false);
+  }, [myStream, peerStream]);
 
   return (
     <CallLayout>
@@ -21,8 +28,8 @@ const VideoContainer = () => {
           marginBottom: '126px',
         }}
       >
-        <PeerVideo addTrackEvent={registerTrackEvent} />
-        <MyVideo stream={stream} />
+        {peerState ? <PeerVideo stream={peerStream} /> : <LoadingVideo callState={callState} />}
+        {myState ? <MyVideo stream={myStream} /> : <LoadingVideo callState={callState} />}
       </div>
       <VideoOption />
     </CallLayout>

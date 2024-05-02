@@ -6,7 +6,7 @@ import { UpdateProps } from '@hooks';
 interface Props {
   audioList: MediaDeviceInfo[];
   stream: MediaStream | null;
-  updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack[]>;
+  updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack | null>;
 }
 const AudioSelect = ({ audioList, stream, updateStream }: Props) => {
   const [selectedAudio, setSelectedAudio] = useState<MediaStreamTrack>();
@@ -16,16 +16,16 @@ const AudioSelect = ({ audioList, stream, updateStream }: Props) => {
 
     const value = e.target.value;
     const constrains = { audio: { deviceId: value } };
-    const tracks = await updateStream({
+    const track = await updateStream({
       type: 'audio',
       constrains,
     });
-    setSelectedAudio(tracks[0]);
+    if (track) setSelectedAudio(track);
   };
   useEffect(() => {
-    const track = stream?.getTracks();
+    const track = stream?.getAudioTracks();
     if (track) setSelectedAudio(track[0]);
-  }, []);
+  }, [stream]);
   return (
     <Select
       css={{ border: 'none' }}

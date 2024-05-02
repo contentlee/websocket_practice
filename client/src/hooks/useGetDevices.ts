@@ -42,29 +42,29 @@ const useGetDevices = (type: 'audio' | 'video') => {
     }
   };
 
+  const init = () => {
+    try {
+      updateDeviceList(type);
+
+      // 기기 변경사항 수신대기
+      navigator.mediaDevices.addEventListener('devicechange', () => {
+        try {
+          updateDeviceList(type);
+        } catch (err) {
+          console.log(err);
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
-    const setting = () => {
-      try {
-        updateDeviceList(type);
-
-        // 기기 변경사항 수신대기
-        navigator.mediaDevices.addEventListener('devicechange', () => {
-          try {
-            updateDeviceList(type);
-          } catch (err) {
-            console.log(err);
-          }
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    setting();
+    init();
   }, []);
 
   if (type === 'audio') return { audioList };
-  return { videoList, audioList };
+  return { videoList, audioList, init };
 };
 
 export default useGetDevices;

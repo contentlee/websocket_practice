@@ -10,7 +10,7 @@ const VideoOption = () => {
   const { name: roomName } = useParams();
   const { name: userName } = useRecoilValue(userAtom);
 
-  const { peerConnection, stream, updateStream, toggleStream, exitCall } =
+  const { peerConnection, myStream, updateStream, toggleStream, exitCall } =
     useContext(PeerConnectionContext);
   const { audioList, videoList } = useContext(DevicesContext);
 
@@ -32,21 +32,21 @@ const VideoOption = () => {
     >
       <VideoSelect
         peerConnection={peerConnection}
-        stream={stream}
+        stream={myStream}
         list={audioList}
         type="audio"
         updateStream={updateStream}
       />
       <VideoSelect
         peerConnection={peerConnection}
-        stream={stream}
+        stream={myStream}
         list={videoList}
         type="video"
         updateStream={updateStream}
       />
       <div css={{ display: 'flex', width: '100%' }}>
-        <VideoToggleButton css={{ flex: 1 / 3 }} stream={stream} toggleStream={toggleStream} />
-        <AudioToggleButton css={{ flex: 1 / 3 }} stream={stream} toggleStream={toggleStream} />
+        <VideoToggleButton css={{ flex: 1 / 3 }} stream={myStream} toggleStream={toggleStream} />
+        <AudioToggleButton css={{ flex: 1 / 3 }} stream={myStream} toggleStream={toggleStream} />
         <ExitButton
           css={{ flex: 1 / 3 }}
           roomName={roomName!}

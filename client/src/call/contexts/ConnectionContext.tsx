@@ -1,28 +1,31 @@
-import { userAtom } from '@atoms/userAtom';
-import { UpdateProps, useAlert, useGetDevices, usePeerConnect } from '@hooks';
-import { callSocket, socket } from '@socket';
 import { ReactNode, createContext, useCallback, useEffect } from 'react';
+
 import { useNavigate, useParams } from 'react-router';
 import { useBeforeUnload } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 
+import { userAtom } from '@atoms/userAtom';
+import { UpdateProps, useAlert, useGetDevices, usePeerConnect } from '@hooks';
+import { callSocket, socket } from '@socket';
+
 interface PeerConnection {
   peerConnection: RTCPeerConnection | null;
-  stream: MediaStream | null;
-
+  myStream: MediaStream | null;
+  peerStream: MediaStream | null;
   callState: 'connect' | 'waiting';
-  registerTrackEvent: (element: HTMLAudioElement | HTMLVideoElement) => void;
-  updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack[]>;
+  devicePermissionState: boolean;
+  updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack | null>;
   toggleStream: (type: 'audio' | 'video') => boolean;
   exitCall: () => void;
 }
 
 export const PeerConnectionContext = createContext<PeerConnection>({
   peerConnection: null,
-  stream: null,
+  myStream: null,
+  peerStream: null,
   callState: 'waiting',
-  registerTrackEvent: () => {},
-  updateStream: () => new Promise(() => {}),
+  devicePermissionState: false,
+  updateStream: () => new Promise(() => null),
   toggleStream: () => false,
   exitCall: () => {},
 });
@@ -37,6 +40,11 @@ export const DevicesContext = createContext<Devices>({
 });
 
 const ICE_SERVER_URL = 'stun:stun.l.google.com:19302';
+
+const DEFAULT_CONSTRAINS: { [index: string]: MediaStreamConstraints } = {
+  audio: { audio: true },
+  video: { audio: true, video: true },
+};
 
 const ConnectionContext = ({
   type,
@@ -53,24 +61,27 @@ const ConnectionContext = ({
 
   const {
     peerConnection,
-    stream,
+    myStream,
+    peerStream,
     callState,
     permit,
+    devicePermissionState,
     receivePermit,
     createOffer,
     receiveOffer,
     createAnswer,
     receiveAnswer,
     updateStream,
-    registerTrackEvent,
     resetTrack,
+    registerTrackEvent,
     setIcecandidate,
     registerIcecandidateEvent,
+    registerRestartIcecandidateEvent,
+    registerChangeDeviceEvent,
     toggleStream,
     changePermit,
   } = usePeerConnect({
     iceServerUrl: ICE_SERVER_URL,
-    type,
   });
   const devices = useGetDevices(type);
 
@@ -89,6 +100,7 @@ const ConnectionContext = ({
     if (offer) callSocket.sendOffer(roomName!, offer, () => {});
     else addAlert('error', '연결에 실패하였습니다.');
   };
+
   const offer = async (description: RTCSessionDescriptionInit) => {
     receiveOffer(description);
     const answer = await createAnswer();
@@ -126,9 +138,25 @@ const ConnectionContext = ({
     navigate(-1);
   };
 
-  useEffect(() => {
+  const finishCall = (callback: (...arg: any) => void) => () => {
+    callSocket.finishCall(roomName!, userName, callback);
+  };
+
+  const init = async () => {
+    await updateStream({ constrains: DEFAULT_CONSTRAINS[type], type });
+
     initPermit();
     registerIcecandidateEvent(sendIcecandidate);
+    registerRestartIcecandidateEvent(
+      () => {},
+      finishCall(() => navigate(-1)),
+    );
+    registerTrackEvent();
+    registerChangeDeviceEvent();
+  };
+
+  useEffect(() => {
+    init();
 
     // when peer permit your call
     callSocket.permitCall(permitCall).on();
@@ -151,21 +179,23 @@ const ConnectionContext = ({
       callSocket.cancelCall(cancelCall).off();
       callSocket.endCall(endCall).off();
     };
-  }, [socket, peerConnection, stream]);
+  }, [socket]);
 
   // 창을 닫게 되는 경우
   useBeforeUnload(
-    useCallback(() => {
-      callSocket.finishCall(roomName!, userName, () => {});
-    }, []),
+    useCallback(
+      finishCall(() => {}),
+      [],
+    ),
   );
   return (
     <PeerConnectionContext.Provider
       value={{
         peerConnection,
-        stream,
+        myStream,
+        peerStream,
         callState,
-        registerTrackEvent,
+        devicePermissionState,
         updateStream,
         toggleStream,
         exitCall,

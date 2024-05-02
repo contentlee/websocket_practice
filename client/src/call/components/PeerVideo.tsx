@@ -1,23 +1,26 @@
 import { useEffect, useRef } from 'react';
 
 interface Props {
-  addTrackEvent: (device: HTMLVideoElement | HTMLAudioElement) => void;
+  stream: MediaStream | null;
 }
 
-const PeerVideo = ({ addTrackEvent }: Props) => {
+const PeerVideo = ({ stream }: Props) => {
   const peerVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (peerVideoRef.current) addTrackEvent(peerVideoRef.current);
-  }, [peerVideoRef.current]);
+    if (peerVideoRef.current) {
+      peerVideoRef.current.srcObject = stream;
+      peerVideoRef.current.load();
+    }
+  }, [peerVideoRef.current, stream]);
   return (
     <video
-      muted
       autoPlay
       playsInline
       controls={false}
       ref={peerVideoRef}
       css={{
+        flex: 1,
         width: '100%',
         height: '100%',
       }}

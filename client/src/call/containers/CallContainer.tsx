@@ -7,12 +7,15 @@ import { DevicesContext, PeerConnectionContext } from '../contexts';
 const CallContainer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const { callState, peerConnection, registerTrackEvent } = useContext(PeerConnectionContext);
+  const { callState, peerStream } = useContext(PeerConnectionContext);
   const { audioList } = useContext(DevicesContext);
 
   useEffect(() => {
-    if (audioRef.current) registerTrackEvent(audioRef.current);
-  }, [audioRef.current, peerConnection]);
+    if (audioRef.current) {
+      audioRef.current.srcObject = peerStream;
+      audioRef.current.load();
+    }
+  }, [audioRef.current, peerStream]);
 
   return (
     <CallLayout>

@@ -9,7 +9,7 @@ const callSocket = {
   answer: (callback: (answer: RTCSessionDescriptionInit) => void) =>
     socket.receive('answer', callback),
   icecandidate: (callback: (candidate: RTCIceCandidateInit) => void) =>
-    socket.receive('idcecandidate', callback),
+    socket.receive('icecandidate', callback),
 
   sendPermit: (room_name: string, callback: () => void) =>
     socket.send('permit_call', room_name, callback),
@@ -18,7 +18,7 @@ const callSocket = {
   sendAnswer: (room_name: string, answer: RTCSessionDescriptionInit, callback: () => void) =>
     socket.send('answer', room_name, answer, callback),
   sendIcecandidate: (room_name: string, cadidate: RTCIceCandidate, callback: () => void) =>
-    socket.send('icecadidate', room_name, cadidate, callback),
+    socket.send('icecandidate', room_name, cadidate, callback),
 
   finishCall: (room_name: string, user_name: string, callback: () => void) =>
     socket.send('end_call', room_name, user_name, callback),

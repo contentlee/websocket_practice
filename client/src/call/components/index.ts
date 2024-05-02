@@ -5,6 +5,7 @@ import VideoToggleButton from './VideoToggleButton';
 
 import MyVideo from './MyVideo';
 import PeerVideo from './PeerVideo';
+import LoadingVideo from './LoadingVideo';
 
 import CallLayout from './CallLayout';
 import CallState from './CallState';
@@ -17,6 +18,7 @@ export {
   VideoToggleButton,
   MyVideo,
   PeerVideo,
+  LoadingVideo,
   CallLayout,
   CallState,
   ExitButton,

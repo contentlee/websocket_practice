@@ -8,7 +8,10 @@ const MyVideo = ({ stream }: Props) => {
   const myVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (stream && myVideoRef.current) myVideoRef.current.srcObject = stream;
+    if (myVideoRef.current) {
+      myVideoRef.current.srcObject = stream;
+      myVideoRef.current.load();
+    }
   }, [myVideoRef.current, stream]);
   return (
     <video
@@ -18,6 +21,7 @@ const MyVideo = ({ stream }: Props) => {
       controls={false}
       ref={myVideoRef}
       css={{
+        flex: 1,
         width: '100%',
         height: '100%',
       }}
