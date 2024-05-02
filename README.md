@@ -2,7 +2,9 @@
 
 ## Description
 
-가볍게 사용할 수 있는 채팅앱입니다. Socket.io와 WebRTC 학습을 위해 진행 중인 프로젝트입니다.
+- Socket.io와 WebRTC로 만들어진 채팅앱입니다. 채팅, 1:1 음성 통화 및 영상 통화를 지원하고 있습니다.
+- 싱글톤 패턴을 사용하여 socket Provider를 만들었고, Provider를 통해 socket 요청을 정형화하였습니다.
+- WebRTC 연결을 위한 hook을 만들어 제공하고 있습니다. 외부 의존성을 줄이기 위해 상태와 메서드만을 반환하도록 했고, 실제 실행의 경우는 context에서 이루어지도록 하였습니다.
 
 ![img](https://i.ibb.co/6ymYVfK/socket-practice.png)
 [영상으로보기](https://youtu.be/mgTl0C5mP2c)
@@ -17,7 +19,7 @@ $ yarn install
 $ yarn start
 ```
 
-## Stack (FE)
+## FE Stack
 
 - Bundler : Vite
 - Base : Typescript, React
@@ -54,20 +56,7 @@ $ yarn start
   }
 ```
 
-## Folder Structure
-
-- Main Design Pattern : Container-Presenter Pattern
-- Folder Description
-  - 비지니스 로직을 중심으로, 페이지별 폴더 구조를 잡았습니다.
-  - assets : 아이콘, 이미지 등과 같은 정적 파일을 담고 있습니다.
-  - atoms : recoil을 통해 전역변수를 관리합니다. (현재 UI 상태값과 사용자 정보만을 관리하고 있습니다.)
-  - chat : 채팅의 핵심적인 기능들인 메세지를 보내고 받는 기능을 담당하는 폴더입니다.
-  - common : 모든 페이지들에서 공통적으로 사용될 수 있는 요소들을 담았습니다.
-  - entry : 채팅방 리스트를 보고, 선택하거나 만들 수 있는 기능을 담당하고 있는 폴더입니다.
-  - login : 사용자가 서비스에 입장할 수 있도록 도와주는 폴더입니다.
-  - utils : 색상 관리 유틸을 담고 있습니다.
-  - App.tsx : 현재 React Router를 통해 SPA Routing을 관리합니다.
-  - main.tsx : 앱 사용을 위한 모든 Provider를 설정합니다.
+## FE Folder Structure
 
 ```jsx
 src
@@ -94,20 +83,7 @@ src
   └─main.tsx
 ```
 
-## Current Progress
+## Next Process
 
-- 일반적인 채팅의 기능을 모두 담고 있습니다.
-- MongoDB와의 연결을 통해 일회성이 아닌 다회성으로 채팅방을 이용할 수 있도록 하였습니다.
-- 로그인 기능보다는, 현재는 간편하게 사용될 수 있도록, 사용자 이름 입력 페이지를 추가했습니다.
-
-## Next Progress
-
-- 특정 요청을 http 로 변경하여 효율적으로 서버 요청하도록 리팩토링
-- 통화 종료의 여러 방식에 대한 대응 구현
-
-## About this project
-
-- [폴더 구조에 관하여](https://industrious-backbone-3d5.notion.site/bdf3b2f412cc4cb59f3e86f56898f738?pvs=4)
-- [사용자 간의 자연스러운 연결을 위해](https://industrious-backbone-3d5.notion.site/7e1201408d9e47b683b5180e1ab3c096?pvs=4)
-- [방심했던 socket.io 연결](https://industrious-backbone-3d5.notion.site/socket-io-05d6d662b9424aae8d14fb9074825d1d?pvs=4)
-- [useAnimate 구현](https://industrious-backbone-3d5.notion.site/useAnimate-f1325ec0a53d41a1bda64121e3f1e5b3?pvs=4)
+- Chat의 이전 채팅 불러오기 기능
+- 초기 기기 권한 미활성화시 발생하는 문제 헤결 (중간 세팅 단계를 추가하거나(zoom과 같이) 권한 활성화 후 다시 연결하는 방식)
