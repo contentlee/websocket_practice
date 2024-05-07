@@ -69,7 +69,6 @@ src
   │  ├─components
   │  ├─containers
   │  ├─contexts
-  │  ├─helpers
   │  └─pages
   ├─chat
   │  ├─components
