@@ -1,28 +1,28 @@
-export interface Chat {
+export interface TChat {
   type: string;
   date: Date;
   msg: string;
   user: string;
 }
 
-export interface BaseRoom {
+export interface TBaseRoom {
   name: string;
   attendee: { user: string; msg_index: number }[];
-  chat: Chat[];
+  chat: TChat[];
 }
-export interface Room extends BaseRoom {
+export interface TRoom extends TBaseRoom {
   max_length: number;
   init_msg: string;
 }
 
-export interface RoomsInfo {
+export interface TRoomsInfo {
   name: string;
   attendee: string[];
   max_length: number;
 }
 
-export interface RoomInfo {
+export interface TRoomInfo {
   name: string;
   attendee: string[];
-  chat: Chat[];
+  chat: TChat[];
 }

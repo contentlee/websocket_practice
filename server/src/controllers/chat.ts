@@ -1,5 +1,5 @@
 import { ChatService, RoomService } from "../services";
-import { Chat } from "../utils/types";
+import { TChat } from "../utils/types";
 import BaseController from "./base";
 
 class ChatController extends BaseController {
@@ -9,7 +9,7 @@ class ChatController extends BaseController {
     roomName: string,
     userName: string,
     endIdx: number,
-    done: (chats: Chat[], startIdx: number) => void
+    done: (chats: TChat[], startIdx: number) => void
   ) => {
     if (!userName) this.requireValidation();
     try {
@@ -24,8 +24,8 @@ class ChatController extends BaseController {
     if (!userName) return this.requireValidation();
 
     try {
-      await this.chatService.sendMessage(message, roomName, userName);
-      this.socket.to(roomName).emit("new_message", userName, message);
+      const chat = await this.chatService.sendMessage(message, roomName, userName);
+      this.socket.to(roomName).emit("new_message", chat);
       done();
     } catch (err) {
       this.sendError(err);

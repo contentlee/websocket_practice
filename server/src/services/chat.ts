@@ -1,31 +1,27 @@
+import { Chat } from "../chat";
 import { ChatModel, RoomModel } from "../models";
-import BaseService from "./base";
+import { Room } from "../room";
 
-class ChatService extends BaseService {
+class ChatService {
   private roomModel = new RoomModel();
   private chatModel = new ChatModel();
 
-  public async getChats(roomName: string, userName: string, endIdx: number) {
-    const room = await this.roomModel.getRoom(roomName);
-    if (!room) throw new Error("not_exist");
+  public async getChats(roomName: string, userName: string, lastIdx: number) {
+    const data = await this.roomModel.getRoom(roomName);
+    if (!data) throw new Error("not_exist");
 
-    const user = room.attendee.find((v) => v.user === userName);
-    if (!user) throw new Error("not_attendee");
+    const room = new Room(data);
+    if (!room.isAttendee(userName)) throw new Error("not_attendee");
 
-    const startIdx = this._mkChatIdx(user.msg_index, endIdx);
+    const { chats, curIdx } = room.setChats(userName, lastIdx);
 
-    return { chats: room.chat.slice(startIdx, endIdx), startIdx };
+    return { chats, startIdx: curIdx };
   }
 
-  public sendMessage(msg: string, room: string, user: string) {
-    const chat = {
-      type: "message",
-      date: new Date(),
-      msg,
-      user,
-    };
-
-    return this.chatModel.addMessage(chat, room);
+  public async sendMessage(msg: string, room: string, user: string) {
+    const chat = new Chat().createMsg(msg, user);
+    await this.chatModel.addMessage(chat, room);
+    return chat;
   }
 }
 

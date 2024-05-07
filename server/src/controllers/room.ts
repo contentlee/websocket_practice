@@ -1,11 +1,11 @@
 import { RoomService } from "../services";
-import { RoomInfo, RoomsInfo } from "../utils/types";
+import { TRoomInfo, TRoomsInfo } from "../utils/types";
 import BaseController from "./base";
 
 class RoomController extends BaseController {
   private service = new RoomService();
 
-  public getRoom = async (roomName: string, userName: string, done: (room: RoomInfo, startIdx: number) => void) => {
+  public getRoom = async (roomName: string, userName: string, done: (room: TRoomInfo, startIdx: number) => void) => {
     if (!userName) return this.requireValidation();
     try {
       const { room, startIdx } = await this.service.getRoom(roomName, userName);
@@ -15,7 +15,7 @@ class RoomController extends BaseController {
     }
   };
 
-  public getRooms = async (userName: string, done: (list: RoomsInfo[]) => void) => {
+  public getRooms = async (userName: string, done: (list: TRoomsInfo[]) => void) => {
     if (!userName) return this.requireValidation();
     try {
       const rooms = await this.service.getRooms();

@@ -1,12 +1,16 @@
 import BaseModel from "./base";
 
-import { Chat } from "../utils/types";
+import { TChat } from "../utils/types";
 
 class ChatModel {
   private model = new BaseModel("chat");
 
-  public addMessage(chat: Chat, name: string) {
+  public addMessage(chat: TChat, name: string) {
     return this.model.getCollection().updateOne({ name }, { $addToSet: { chat } });
+  }
+
+  public getChats(name: string) {
+    return this.model.getCollection().findOne({ name }, {});
   }
 }
 

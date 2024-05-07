@@ -1,18 +1,18 @@
-import { Room } from "../utils/types";
+import { TRoom } from "../utils/types";
 import BaseModel from "./base";
 
 class RoomModel {
   private model = new BaseModel("chat");
 
   public getRoom(name: string) {
-    return this.model.getCollection<Room>().findOne({ name });
+    return this.model.getCollection<TRoom>().findOne({ name });
   }
 
   public getRooms() {
-    return this.model.getCollection<Room>().find().toArray();
+    return this.model.getCollection<TRoom>().find().toArray();
   }
 
-  public createRoom(room: Room) {
+  public createRoom(room: TRoom) {
     return this.model.getCollection().insertOne(room);
   }
 
