@@ -6,10 +6,7 @@
 - 싱글톤 패턴을 사용하여 socket Provider를 만들었고, Provider를 통해 socket 요청을 정형화하였습니다.
 - WebRTC 연결을 위한 hook을 만들어 제공하고 있습니다. 외부 의존성을 줄이기 위해 상태와 메서드만을 반환하도록 했고, 실제 실행의 경우는 context에서 이루어지도록 하였습니다.
 
-![img](https://file.notion.so/f/f/1cf345fc-6f24-42f9-af4f-e37913a9d7f1/e2126199-d3dc-40bf-b3ad-dbc2bb1c9799/CallProcess.png?id=97c7bfbe-6830-41b1-a6c7-8048e9c66a41&table=block&spaceId=1cf345fc-6f24-42f9-af4f-e37913a9d7f1&expirationTimestamp=1714996800000&signature=6NJKQFm30u4I7W8puFuXouO2Ayl0Ify8vnKWDK770nM&downloadName=CallProcess.png)
-![img](https://file.notion.so/f/f/1cf345fc-6f24-42f9-af4f-e37913a9d7f1/49a3bba2-e8db-47d6-8aaf-ba6f8cc24bdf/webRTC.png?id=e4efa5af-5858-447c-b118-a664a874b9d1&table=block&spaceId=1cf345fc-6f24-42f9-af4f-e37913a9d7f1&expirationTimestamp=1715054400000&signature=6zbfafdJXKce0DhI3dBoNQnqiWjZFIM0GOt5hdh0TeY&downloadName=webRTC.png)
-
-![img](https://file.notion.so/f/f/1cf345fc-6f24-42f9-af4f-e37913a9d7f1/c4a8d31e-476b-41ef-95c3-6825385f33a7/chat_practice.png?id=d90f2379-19d2-48e4-bb4a-04fcad36a6df&table=block&spaceId=1cf345fc-6f24-42f9-af4f-e37913a9d7f1&expirationTimestamp=1715004000000&signature=egoXl4Nu-t9ccdcue-QLlCzpJv4PWeujEj7kXeDTi-U&downloadName=chat_practice.png)
+[ABOUT WEBRTC](https://industrious-backbone-3d5.notion.site/WEBRTC-1893b59ff8ef489e9082247ccb92b82e?pvs=4)
 [영상으로보기](https://youtu.be/mgTl0C5mP2c)
 
 ## Enviroment
