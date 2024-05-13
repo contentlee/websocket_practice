@@ -26,43 +26,43 @@ class Room {
     };
   }
 
-  public getRoom() {
+  public getRoom = () => {
     return {
       name: this.name,
       attendee: this._getAttendeeNameList(),
       chat: this.chats,
       max_length: this.maxLength,
     };
-  }
+  };
 
-  public setChats(userName: string, lastIdx: number = this.curIdx) {
+  public setChats = (userName: string, lastIdx: number = this.curIdx) => {
     const startIdx = this._getChatStartIdx(userName, lastIdx);
     this.curIdx = startIdx;
     this.chats = [...this.chats.slice(startIdx, lastIdx)];
     return this;
-  }
+  };
 
-  public isAttendee(userName: string) {
+  public isAttendee = (userName: string) => {
     return !!this.attendee.find(({ user }) => user === userName);
-  }
+  };
 
-  public isOverAttendee() {
+  public isOverAttendee = () => {
     return this.maxLength < this.attendee.length + 1;
-  }
+  };
 
-  public _getAttendeeNameList() {
+  public _getAttendeeNameList = () => {
     return this.attendee.map((attendee) => attendee.user);
-  }
+  };
 
-  public _getUserFirstChat(userName: string) {
+  public _getUserFirstChat = (userName: string) => {
     return this.attendee.find(({ user }) => user === userName)?.msg_index;
-  }
+  };
 
-  public _getChatStartIdx(userName: string, lastIdx: number) {
+  public _getChatStartIdx = (userName: string, lastIdx: number) => {
     const intialIdx = this._getUserFirstChat(userName);
     const startIdx = lastIdx - intialIdx!;
     return startIdx > this.unit ? lastIdx - this.unit : intialIdx!;
-  }
+  };
 }
 
 export default Room;

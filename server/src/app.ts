@@ -1,9 +1,9 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { createServer } from "http";
 import express from "express";
 import dotenv from "dotenv";
 
-import { SocketEvent } from "./routers";
+import { ChatRoute, LoginRoute, RTCRoute, RoomRoute } from "./routers";
 
 import Database from "./libs/database";
 
@@ -21,6 +21,15 @@ class App {
     dotenv.config();
   }
 
+  initRoute(socket: Socket) {
+    const routes = [ChatRoute, LoginRoute, RoomRoute, RTCRoute];
+
+    routes.forEach((Route) => {
+      const route = new Route(this.wsServer, socket);
+      if (route.router.stack.length) this.app.use(route.router);
+    });
+  }
+
   initServer() {
     this.wsServer.attach(this.httpServer, {
       cors: {
@@ -35,7 +44,7 @@ class App {
       Database.connect(() => {
         this.wsServer.on("connection", (socket) => {
           console.log("listen on ws");
-          new SocketEvent(this.wsServer, socket);
+          this.initRoute(socket);
         });
       });
     });

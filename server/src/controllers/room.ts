@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from "express";
 import { RoomService } from "../services";
 import { TRoomInfo, TRoomsInfo } from "../utils/types";
 import BaseController from "./base";
@@ -5,25 +6,45 @@ import BaseController from "./base";
 class RoomController extends BaseController {
   private service = new RoomService();
 
-  public getRoom = async (roomName: string, userName: string, done: (room: TRoomInfo, startIdx: number) => void) => {
-    if (!userName) return this.requireValidation();
+  public getRoom = async (req: Request, res: Response) => {
+    if (typeof req.cookies.user_name !== "string") return this.requireValidation();
     try {
-      const { room, startIdx } = await this.service.getRoom(roomName, userName);
-      done(room, startIdx);
+      const { room, startIdx } = await this.service.getRoom(req.params.room_name, req.body.userName);
+      res.status(200).json({ room, start_idx: startIdx });
     } catch (err) {
       this.sendError(err);
     }
   };
 
-  public getRooms = async (userName: string, done: (list: TRoomsInfo[]) => void) => {
-    if (!userName) return this.requireValidation();
+  public getRooms = async (req: Request, res: Response) => {
+    if (typeof req.cookies.user_name !== "string") return this.requireValidation();
     try {
       const rooms = await this.service.getRooms();
-      done(rooms);
+      res.status(200).json({ rooms });
     } catch (err) {
       this.sendError(err);
     }
   };
+
+  // public getRoom = async (roomName: string, userName: string, done: (room: TRoomInfo, startIdx: number) => void) => {
+  //   if (!userName) return this.requireValidation();
+  //   try {
+  //     const { room, startIdx } = await this.service.getRoom(roomName, userName);
+  //     done(room, startIdx);
+  //   } catch (err) {
+  //     this.sendError(err);
+  //   }
+  // };
+
+  // public getRooms = async (userName: string, done: (list: TRoomsInfo[]) => void) => {
+  //   if (!userName) return this.requireValidation();
+  //   try {
+  //     const rooms = await this.service.getRooms();
+  //     done(rooms);
+  //   } catch (err) {
+  //     this.sendError(err);
+  //   }
+  // };
 
   public createRoom = async (userName: string, info: { [index: string]: string }, done: () => void) => {
     if (!userName) return this.requireValidation();
