@@ -18,6 +18,7 @@ export default defineConfig({
       },
       { find: '@entry', replacement: resolve(__dirname, 'src/entry/pages') },
       { find: '@hooks', replacement: resolve(__dirname, 'src/hooks') },
+      { find: '@http', replacement: resolve(__dirname, 'src/http') },
       { find: '@login', replacement: resolve(__dirname, 'src/login/pages') },
       { find: '@socket', replacement: resolve(__dirname, 'src/socket') },
       { find: '@pages', replacement: resolve(__dirname, 'src/common/pages') },
@@ -35,10 +36,16 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'ws://192.168.0.122:8080',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      '/socket': {
+        target: 'ws://192.168.0.122:8080',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/socket/, ''),
       },
     },
   },

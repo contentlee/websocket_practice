@@ -36,6 +36,7 @@ module.exports = {
           { pattern: '@hooks', group: 'internal' },
           { pattern: '@pages', group: 'internal' },
           { pattern: '@entry', group: 'internal' },
+          { pattern: '@http', group: 'internal' },
           { pattern: '@login', group: 'internal' },
           { pattern: '@chat', group: 'internal' },
           { pattern: '@call', group: 'internal' },

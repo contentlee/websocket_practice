@@ -6,7 +6,3 @@ import loginSocket from './login';
 import roomSocket from './room';
 
 export { socket, callSocket, chatSocket, loginSocket, roomSocket };
-
-import { Chat, Room } from './room';
-
-export type { Chat, Room };

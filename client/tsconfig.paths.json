@@ -10,6 +10,7 @@
       "@components": ["src/common/components"],
       "@entry": ["src/entry/pages"],
       "@hooks": ["src/hooks"],
+      "@http/*": ["src/http/*"],
       "@login": ["src/login/pages"],
       "@socket": ["src/socket"],
       "@pages": ["src/common/pages"],
