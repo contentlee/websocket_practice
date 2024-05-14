@@ -4,9 +4,11 @@ import { changeUser, userAtom } from '@atoms/userAtom';
 import { useAlert } from '@hooks';
 
 import { Input, Button } from '@components';
-import { loginSocket } from '@socket';
+import { login } from '@http/login';
+import { useNavigate } from 'react-router';
 
 const LoginContainer = () => {
+  const navigate = useNavigate();
   const [_, setUser] = useRecoilState(userAtom);
 
   const { addAlert } = useAlert();
@@ -16,13 +18,14 @@ const LoginContainer = () => {
     const { value: id } = e.currentTarget[0] as HTMLInputElement;
 
     if (!id) return addAlert('error', '아이디를 입력해주세요!');
-    const callback = () => {
-      setUser(changeUser(id));
-      addAlert('success', '로그인에 성공하였습니다!');
-    };
 
     // TODO: 로그인 구현
-    loginSocket.login(id, callback);
+    login(id).then(() => {
+      setUser(changeUser(id));
+      addAlert('success', '로그인에 성공하였습니다!');
+      navigate('/');
+    });
+    // loginSocket.login(id, callback);
   };
 
   return (
