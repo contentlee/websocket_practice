@@ -11,7 +11,6 @@ const MsgLayout = ({ children }: Props) => {
     if (!!wrapRef.current) {
       if (scrollHeight === 0) {
         wrapRef.current.scrollTo({ top: wrapRef.current.scrollHeight });
-        console.log(wrapRef.current.scrollTop);
       } else {
         const height = wrapRef.current.scrollHeight - scrollHeight;
         wrapRef.current.scrollTo({ top: height });
