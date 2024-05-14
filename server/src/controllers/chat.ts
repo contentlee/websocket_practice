@@ -25,7 +25,6 @@ class ChatController extends BaseController {
 
     try {
       const userName = this.getCookieValue(req.headers.cookie, "user_name");
-      console.log(req.params);
       const { chats, startIdx } = await this.chatService.getChats(req.params.roomname, userName, +req.params.idx);
       res.status(200).json({ chats, start_idx: startIdx });
     } catch (err) {
