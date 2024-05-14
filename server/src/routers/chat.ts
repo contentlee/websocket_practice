@@ -7,15 +7,15 @@ class ChatRoute extends BaseRoute {
   constructor(server: Server, socket: Socket) {
     super(socket);
     this.controller = new ChatController(server, socket);
-    this.path = "/chats";
+    this.path = "/rooms/:roomname/chats";
 
     this.initHttp();
     this.initSocket();
+    this.route();
   }
 
   initHttp = () => {
-    this.routes = [["get", "/:roomname/:idx", [this.controller.getChats]]];
-    this.route();
+    this.routes = [["get", "/:idx", [this.controller.getChats]]];
   };
 
   initSocket = () => {

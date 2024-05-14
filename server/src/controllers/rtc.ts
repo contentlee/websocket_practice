@@ -1,5 +1,5 @@
 import BaseController from "./base";
-import client from "../utils/context";
+import { clients } from "../room";
 
 class RTCController extends BaseController {
   public offer = (roomName: string, offer: RTCSessionDescriptionInit, done: () => void) => {
@@ -8,7 +8,7 @@ class RTCController extends BaseController {
   };
 
   public answer = (fromName: string, answer: RTCSessionDescriptionInit, done: () => void) => {
-    const userInfo = client.findUserIdByName(fromName);
+    const userInfo = clients.findUserIdByName(fromName);
     if (userInfo) {
       this.socket.to(userInfo.id).emit("answer", answer);
       done();

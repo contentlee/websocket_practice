@@ -1,2 +1,5 @@
+import Chat from "./chat";
 import Room from "./room";
-export { Room };
+import clients from "./clients";
+
+export { clients, Chat, Room };

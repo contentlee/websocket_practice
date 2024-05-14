@@ -8,13 +8,16 @@ class LoginRoute extends BaseRoute {
   constructor(server: Server, socket: Socket) {
     super(socket);
     this.controller = new LoginController(server, socket);
+    this.path = "/login";
 
+    this.initHttp();
     this.initSocket();
+    this.route();
   }
 
-  // initHttp = () => {
-  //   this.routes = [["post", "/login", [this.controller.login]]];
-  // };
+  initHttp = () => {
+    this.routes = [["post", "", [this.controller.login]]];
+  };
 
   initSocket = () => {
     this.socket.on("login", this.controller.login);

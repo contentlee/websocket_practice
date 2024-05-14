@@ -7,21 +7,23 @@ class RoomRoute extends BaseRoute {
   constructor(server: Server, socket: Socket) {
     super(socket);
     this.controller = new RoomController(server, socket);
-    this.path = "room";
+    this.path = "/rooms";
+
+    this.initHttp();
     this.initSocket();
+    this.route();
   }
 
   initHttp = () => {
     this.routes = [
-      ["get", "/:room_name", [this.controller.getRoom]],
       ["get", "/", [this.controller.getRooms]],
+      ["get", "/:room_name", [this.controller.getRoom]],
     ];
-    this.route();
   };
 
   initSocket = () => {
-    this.socket.on("get_room", this.controller.getRoom);
-    this.socket.on("get_rooms", this.controller.getRooms);
+    // this.socket.on("get_room", this.controller.getRoom);
+    // this.socket.on("get_rooms", this.controller.getRooms);
     this.socket.on("create_room", this.controller.createRoom);
     this.socket.on("enter_room", this.controller.enterRoom);
     this.socket.on("leave_room", this.controller.leaveRoom);

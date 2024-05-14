@@ -1,15 +1,16 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { RoomService } from "../services";
-import { TRoomInfo, TRoomsInfo } from "../utils/types";
 import BaseController from "./base";
 
 class RoomController extends BaseController {
   private service = new RoomService();
 
   public getRoom = async (req: Request, res: Response) => {
-    if (typeof req.cookies.user_name !== "string") return this.requireValidation();
+    if (!!!req.headers.cookie) return this.requireValidation();
+
     try {
-      const { room, startIdx } = await this.service.getRoom(req.params.room_name, req.body.userName);
+      const userName = this.getCookieValue(req.headers.cookie, "user_name");
+      const { room, startIdx } = await this.service.getRoom(req.params.room_name, userName);
       res.status(200).json({ room, start_idx: startIdx });
     } catch (err) {
       this.sendError(err);
@@ -17,7 +18,7 @@ class RoomController extends BaseController {
   };
 
   public getRooms = async (req: Request, res: Response) => {
-    if (typeof req.cookies.user_name !== "string") return this.requireValidation();
+    if (!!!req.headers.cookie) return this.requireValidation();
     try {
       const rooms = await this.service.getRooms();
       res.status(200).json({ rooms });

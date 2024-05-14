@@ -1,6 +1,5 @@
 import { ChatModel, RoomModel } from "../models";
-import { Room } from "../room";
-import { Chat } from "../chat";
+import { Chat, Room } from "../room";
 
 class RoomService {
   chatModel = new ChatModel();

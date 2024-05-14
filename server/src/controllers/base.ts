@@ -17,6 +17,13 @@ class BaseController {
     if (error instanceof Error) this.socket.emit(error.message);
     else console.log(error);
   }
+
+  protected getCookieValue(cookies: string, key: string) {
+    return cookies
+      .split(";")
+      .filter((cookie) => cookie.split("=")[0].trim() === key)[0]
+      .split("=")[1];
+  }
 }
 
 export default BaseController;

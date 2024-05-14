@@ -1,4 +1,4 @@
-import { Chat } from "../chat";
+import { Chat } from "../room";
 import { ChatModel, RoomModel } from "../models";
 import { Room } from "../room";
 

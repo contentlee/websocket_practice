@@ -1,9 +1,9 @@
 import BaseController from "./base";
-import Clients from "../utils/context";
+import { clients } from "../room";
 
 class CallContoller extends BaseController {
   public requireCall = (toUserName: string, fromUserName: string, done: () => void) => {
-    const userInfo = Clients.findUserIdByName(toUserName);
+    const userInfo = clients.findUserIdByName(toUserName);
     if (userInfo) {
       this.socket.join(fromUserName);
       this.socket.to(userInfo.id).emit("require_call", fromUserName);
@@ -14,7 +14,7 @@ class CallContoller extends BaseController {
   };
 
   public requireVideoCall = (toUserName: string, fromUserName: string, done: () => void) => {
-    const userInfo = Clients.findUserIdByName(toUserName);
+    const userInfo = clients.findUserIdByName(toUserName);
     if (userInfo) {
       this.socket.join(fromUserName);
       this.socket.to(userInfo.id).emit("require_video_call", fromUserName);

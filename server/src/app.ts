@@ -13,24 +13,42 @@ class App {
   private httpServer = createServer(this.app);
 
   constructor() {
-    this.initUtils();
-    this.initServer();
+    this._initUtils();
+    this._initHeaders();
+    this._initMiddlewares();
+    this._initSocketServer();
   }
 
-  initUtils() {
+  private _initUtils() {
     dotenv.config();
+    this.app.use(express.urlencoded({ extended: true }));
   }
 
-  initRoute(socket: Socket) {
+  private _initMiddlewares() {
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
+  }
+
+  private _initRoute(socket: Socket) {
     const routes = [ChatRoute, LoginRoute, RoomRoute, RTCRoute];
 
     routes.forEach((Route) => {
       const route = new Route(this.wsServer, socket);
-      if (route.router.stack.length) this.app.use(route.router);
+      this.app.use(route.router);
     });
   }
 
-  initServer() {
+  private _initHeaders() {
+    this.app.use((_, res, next) => {
+      res.header("Access-Control-Allow-Origin", process.env.ORIGIN_SUB_DOMAIN);
+      res.header("Access-Control-Allow-Methods", "GET, POST");
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+      next();
+    });
+  }
+
+  private _initSocketServer() {
     this.wsServer.attach(this.httpServer, {
       cors: {
         origin: ["http://192.168.0.122:5173", "http://localhost:5173", "http://localhost:8080"],
@@ -44,7 +62,7 @@ class App {
       Database.connect(() => {
         this.wsServer.on("connection", (socket) => {
           console.log("listen on ws");
-          this.initRoute(socket);
+          this._initRoute(socket);
         });
       });
     });

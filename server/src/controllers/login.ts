@@ -1,16 +1,19 @@
 import { UserService } from "../services";
 import BaseController from "./base";
-import Clients from "../utils/context";
-import { NextFunction, Request, Response } from "express";
+import { clients } from "../room";
+import { Request, Response } from "express";
 
 class LoginController extends BaseController {
   private service = new UserService();
 
-  public login = async (req: Request, res: Response, next: NextFunction) => {
-    if (typeof req.cookies.user_name !== "string") return this.requireValidation();
+  public login = async (req: Request, res: Response) => {
     try {
       this.service.login(req.body.userName, this.socket.id);
-      res.status(200).cookie("user_name", req.body.userName, { httpOnly: true, expires: this._makeExpirationDate(7) });
+      res
+        .status(200)
+        .cookie("user_name", req.body.userName, { httpOnly: true, expires: this._makeExpirationDate(7) })
+        .cookie("user_names", req.body.userName, { httpOnly: true, expires: this._makeExpirationDate(7) })
+        .json({ message: "success login" });
     } catch (err) {
       this.sendError(err);
     }
@@ -23,7 +26,7 @@ class LoginController extends BaseController {
   // };
 
   public logout = () => {
-    Clients.spliceUser(this.socket.id);
+    clients.spliceUser(this.socket.id);
   };
 
   private _makeToday = (val: string | Date | number = new Date().getTime()) => {

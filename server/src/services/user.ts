@@ -1,4 +1,4 @@
-import clients from "../utils/context";
+import { clients } from "../room";
 
 class UserService {
   public login(user: string, id: string) {

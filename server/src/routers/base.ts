@@ -19,13 +19,13 @@ class BaseRoute {
     this.socket = socket;
   }
 
-  protected initializeRoutes([method, url, ...controller]: TRoute) {
+  private _initializeRoutes([method, url, ...controller]: TRoute) {
     this.router[method](this.path + url, ...controller);
   }
 
   protected route() {
     this.routes.forEach((route) => {
-      this.initializeRoutes(route);
+      this._initializeRoutes(route);
     });
   }
 }

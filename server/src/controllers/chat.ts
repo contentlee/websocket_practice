@@ -21,14 +21,12 @@ class ChatController extends BaseController {
   // };
 
   public getChats = async (req: Request, res: Response, next: NextFunction) => {
-    if (typeof req.cookies.user_name !== "string") return this.requireValidation();
+    if (!!!req.headers.cookie) return this.requireValidation();
 
     try {
-      const { chats, startIdx } = await this.chatService.getChats(
-        req.params.roomname,
-        req.cookies.user_name,
-        +req.params.idx
-      );
+      const userName = this.getCookieValue(req.headers.cookie, "user_name");
+      console.log(req.params);
+      const { chats, startIdx } = await this.chatService.getChats(req.params.roomname, userName, +req.params.idx);
       res.status(200).json({ chats, start_idx: startIdx });
     } catch (err) {
       res.status(403).json({ err });
