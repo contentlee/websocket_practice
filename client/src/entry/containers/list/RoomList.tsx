@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 
-import { Room, roomSocket } from '@socket';
+import { roomSocket } from '@socket';
 
 import { userAtom } from '@atoms/userAtom';
 
 import { CreateRoomButton, EmptyItem, LoadingItem, RoomItem } from '.';
+import { Room } from '@utils/types';
+import { getRooms } from '@http/room';
 
 type State = 'loading' | 'empty' | 'filled';
 
@@ -25,7 +27,11 @@ const RoomList = ({ openModal }: Props) => {
       else setState('empty');
       setRooms(list);
     };
-    roomSocket.getRooms(user_name, callback);
+
+    getRooms().then(({ rooms }) => {
+      callback(rooms);
+    });
+
     roomSocket.changeRooms(callback).on();
 
     return () => {
