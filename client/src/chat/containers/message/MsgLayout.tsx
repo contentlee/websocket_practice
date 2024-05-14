@@ -1,16 +1,24 @@
-import { ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 
 interface Props {
   children: ReactNode;
 }
 const MsgLayout = ({ children }: Props) => {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const [scrollHeight, setScrollHeight] = useState(0);
 
   useEffect(() => {
     if (!!wrapRef.current) {
-      wrapRef.current.scrollTop = wrapRef.current.scrollHeight;
+      if (scrollHeight === 0) {
+        wrapRef.current.scrollTo({ top: wrapRef.current.scrollHeight });
+        console.log(wrapRef.current.scrollTop);
+      } else {
+        const height = wrapRef.current.scrollHeight - scrollHeight;
+        wrapRef.current.scrollTo({ top: height });
+      }
+      setScrollHeight(wrapRef.current.scrollHeight);
     }
-  }, [wrapRef.current]);
+  }, [wrapRef.current, children]);
 
   return (
     <div

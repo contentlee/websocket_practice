@@ -1,10 +1,11 @@
+import { useState } from 'react';
+
 import { Modal } from '@components';
 import { ChatLayout } from '../components';
 import Header from './header';
 import Messages from './message';
 import SendForm from './send';
 import UserList from './users';
-import { useState } from 'react';
 
 const ChatContainer = () => {
   const [isOpened, setOpened] = useState(false);

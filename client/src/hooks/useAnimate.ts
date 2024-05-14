@@ -1,4 +1,4 @@
-import { useState, useEffect, RefObject } from 'react';
+import { useState } from 'react';
 
 type AnimationType = 'fadeIn' | 'fadeOut' | 'alert' | 'showAlarm' | 'closeAlarm';
 

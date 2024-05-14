@@ -1,20 +1,31 @@
-import { MouseEvent } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { palette } from '@utils/palette';
+import Io from '@utils/io';
 
-const MoreAndMore = () => {
-  const handleClickMore = (e: MouseEvent) => {
-    e.preventDefault;
-  };
+interface Props {
+  io: Io;
+}
+
+const MoreAndMore = ({ io }: Props) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current) io.observe(ref.current);
+
+    return () => {
+      io.disconnect();
+    };
+  }, []);
 
   return (
     <div
+      ref={ref}
       css={{
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
       }}
-      onClick={handleClickMore}
     >
       <hr
         css={{
