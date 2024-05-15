@@ -3,7 +3,7 @@ import { createServer } from "http";
 import express from "express";
 import dotenv from "dotenv";
 
-import { ChatRoute, LoginRoute, RTCRoute, RoomRoute } from "./routers";
+import { CallRoute, ChatRoute, LoginRoute, RTCRoute, RoomRoute } from "./routers";
 
 import Database from "./libs/database";
 
@@ -30,7 +30,7 @@ class App {
   }
 
   private _initRoute(socket: Socket) {
-    const routes = [ChatRoute, LoginRoute, RoomRoute, RTCRoute];
+    const routes = [CallRoute, ChatRoute, LoginRoute, RoomRoute, RTCRoute];
 
     routes.forEach((Route) => {
       const route = new Route(this.wsServer, socket);
