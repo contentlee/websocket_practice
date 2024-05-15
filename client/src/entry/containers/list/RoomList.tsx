@@ -7,7 +7,6 @@ import { userAtom } from '@atoms/userAtom';
 
 import { CreateRoomButton, EmptyItem, LoadingItem, RoomItem } from '.';
 import { Room } from '@utils/types';
-import { getRooms } from '@http/room';
 
 type State = 'loading' | 'empty' | 'filled';
 
@@ -16,7 +15,7 @@ interface Props {
 }
 
 const RoomList = ({ openModal }: Props) => {
-  const { name: user_name } = useRecoilValue(userAtom);
+  const { name: userName } = useRecoilValue(userAtom);
 
   const [rooms, setRooms] = useState<Room[]>([]);
   const [state, setState] = useState<State>('loading');
@@ -28,16 +27,13 @@ const RoomList = ({ openModal }: Props) => {
       setRooms(list);
     };
 
-    getRooms().then(({ rooms }) => {
-      callback(rooms);
-    });
-
+    roomSocket.getRooms(userName, callback);
     roomSocket.changeRooms(callback).on();
 
     return () => {
       roomSocket.changeRooms(callback).off();
     };
-  }, [roomSocket, user_name]);
+  }, [roomSocket, userName]);
 
   if (state === 'loading') return <LoadingItem />;
   if (state === 'empty') return <EmptyItem openModal={openModal} />;
