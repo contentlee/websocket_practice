@@ -5,7 +5,7 @@ class RoomService {
   chatModel = new ChatModel();
   roomModel = new RoomModel();
 
-  public async isThereRoom(roomName: string) {
+  public async _isThereRoom(roomName: string) {
     const room = await this.roomModel.getRoom(roomName);
     return room ? true : false;
   }
@@ -29,7 +29,7 @@ class RoomService {
   }
 
   public async createRoom(user: string, { name, max_length = "100", init_msg = "" }: { [index: string]: string }) {
-    const duplicated = await this.isThereRoom(name);
+    const duplicated = await this._isThereRoom(name);
     if (duplicated) throw Error("duplicated_name");
     if (Number(max_length) < 0) throw Error("wrong_max");
     const room = Room.createRoom(name, user, max_length, init_msg);

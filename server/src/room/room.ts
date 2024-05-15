@@ -35,7 +35,7 @@ class Room {
     };
   };
 
-  public setChats = (userName: string, lastIdx: number = this.curIdx) => {
+  public setChats = (userName: string, lastIdx: number = this.curIdx + 1) => {
     const startIdx = this._getChatStartIdx(userName, lastIdx);
     this.curIdx = startIdx;
     this.chats = [...this.chats.slice(startIdx, lastIdx)];

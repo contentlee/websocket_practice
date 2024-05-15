@@ -1,7 +1,12 @@
 import BaseController from "./base";
-import { clients } from "../room";
+import { clients } from "../socket";
+import { Server, Socket } from "socket.io";
 
 class CallContoller extends BaseController {
+  constructor(server: Server, socket: Socket) {
+    super(server, socket);
+  }
+
   public requireCall = (toUserName: string, fromUserName: string, done: () => void) => {
     const userInfo = clients.findUserIdByName(toUserName);
     if (userInfo) {

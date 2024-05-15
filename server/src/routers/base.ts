@@ -13,7 +13,7 @@ class BaseRoute {
   protected routes: TRoute[] = [];
   protected path = "";
 
-  protected socket;
+  public socket;
 
   constructor(socket: Socket) {
     this.socket = socket;

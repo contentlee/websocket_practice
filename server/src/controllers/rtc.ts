@@ -1,7 +1,12 @@
 import BaseController from "./base";
-import { clients } from "../room";
+import { clients } from "../socket";
+import { Server, Socket } from "socket.io";
 
 class RTCController extends BaseController {
+  constructor(server: Server, socket: Socket) {
+    super(server, socket);
+  }
+
   public offer = (roomName: string, offer: RTCSessionDescriptionInit, done: () => void) => {
     this.socket.to(roomName).emit("offer", offer);
     done();

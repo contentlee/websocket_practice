@@ -20,7 +20,6 @@ class LoginRoute extends BaseRoute {
   };
 
   initSocket = () => {
-    this.socket.on("login", this.controller.login);
     this.socket.on("disconnect", this.controller.logout);
   };
 }

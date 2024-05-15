@@ -6,6 +6,7 @@ class ChatRoute extends BaseRoute {
   private controller;
   constructor(server: Server, socket: Socket) {
     super(socket);
+    console.log(socket.id, "route");
     this.controller = new ChatController(server, socket);
     this.path = "/rooms/:roomname/chats";
 

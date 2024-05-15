@@ -1,14 +1,20 @@
 import { UserService } from "../services";
 import BaseController from "./base";
-import { clients } from "../room";
+import { clients } from "../socket";
 import { Request, Response } from "express";
+import { Server, Socket } from "socket.io";
 
 class LoginController extends BaseController {
   private service = new UserService();
 
+  constructor(server: Server, socket: Socket) {
+    super(server, socket);
+  }
+
   public login = async (req: Request, res: Response) => {
     try {
       this.service.login(req.body.userName, this.socket.id);
+
       res
         .status(200)
         .cookie("user_name", req.body.userName, { httpOnly: true, expires: this._makeExpirationDate(7) })

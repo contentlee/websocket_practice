@@ -1,9 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { ChatService } from "../services";
 import BaseController from "./base";
+import { Server, Socket } from "socket.io";
 
 class ChatController extends BaseController {
   private chatService = new ChatService();
+
+  constructor(server: Server, socket: Socket) {
+    super(server, socket);
+  }
 
   // public getChats = async (
   //   roomName: string,
@@ -22,7 +27,6 @@ class ChatController extends BaseController {
 
   public getChats = async (req: Request, res: Response, next: NextFunction) => {
     if (!!!req.headers.cookie) return this.requireValidation();
-
     try {
       const userName = this.getCookieValue(req.headers.cookie, "user_name");
       const { chats, startIdx } = await this.chatService.getChats(req.params.roomname, userName, +req.params.idx);
