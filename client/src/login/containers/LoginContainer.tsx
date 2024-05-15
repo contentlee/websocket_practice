@@ -5,6 +5,7 @@ import { changeUser, userAtom } from '@atoms/userAtom';
 import { useAlert } from '@hooks';
 
 import { Input, Button } from '@components';
+import { loginSocket } from '@socket';
 import { login } from '@http/login';
 
 const LoginContainer = () => {
@@ -20,12 +21,18 @@ const LoginContainer = () => {
     if (!id) return addAlert('error', '아이디를 입력해주세요!');
 
     // TODO: 로그인 구현
-    login(id).then(() => {
-      setUser(changeUser(id));
-      addAlert('success', '로그인에 성공하였습니다!');
-      navigate('/');
-    });
-    // loginSocket.login(id, callback);
+    login(id)
+      .then(() => {
+        const callback = () => {
+          setUser(changeUser(id));
+          addAlert('success', '로그인에 성공하였습니다!');
+          navigate('/');
+        };
+        loginSocket.login(id, callback);
+      })
+      .catch(() => {
+        addAlert('error', '로그인에 실패했습니다!');
+      });
   };
 
   return (

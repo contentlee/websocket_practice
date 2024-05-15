@@ -16,11 +16,12 @@ class LoginRoute extends BaseRoute {
   }
 
   initHttp = () => {
-    this.routes = [["post", "", [this.controller.login]]];
+    this.routes = [["post", "", [this.controller.loginOnHttp]]];
   };
 
   initSocket = () => {
     this.socket.on("disconnect", this.controller.logout);
+    this.socket.on("login", this.controller.loginOnSocket);
   };
 }
 

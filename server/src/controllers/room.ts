@@ -13,7 +13,6 @@ class RoomController extends BaseController {
 
   public getRoom = async (req: Request, res: Response) => {
     if (!!!req.headers.cookie) return this.requireValidation();
-    console.log(this.socket.id);
     try {
       const userName = this.getCookieValue(req.headers.cookie, "user_name");
       const { room, startIdx } = await this.service.getRoom(req.params.room_name, userName);

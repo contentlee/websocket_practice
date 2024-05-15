@@ -11,25 +11,24 @@ class LoginController extends BaseController {
     super(server, socket);
   }
 
-  public login = async (req: Request, res: Response) => {
+  public loginOnHttp = async (req: Request, res: Response) => {
     try {
-      this.service.login(req.body.userName, this.socket.id);
+      // this.service.login(req.body.userName, this.socket.id);
 
       res
         .status(200)
         .cookie("user_name", req.body.userName, { httpOnly: true, expires: this._makeExpirationDate(7) })
-        .cookie("user_names", req.body.userName, { httpOnly: true, expires: this._makeExpirationDate(7) })
         .json({ message: "success login" });
     } catch (err) {
       this.sendError(err);
     }
   };
 
-  // public login = (userName: string, done: () => void) => {
-  //   if (!userName) return this.requireValidation();
-  //   this.service.login(userName, this.socket.id);
-  //   done();
-  // };
+  public loginOnSocket = (userName: string, done: () => void) => {
+    if (!userName) return this.requireValidation();
+    this.service.login(userName, this.socket.id);
+    done();
+  };
 
   public logout = () => {
     clients.spliceUser(this.socket.id);
