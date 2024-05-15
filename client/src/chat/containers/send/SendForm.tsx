@@ -23,7 +23,7 @@ const SendForm = ({ children, ...props }: Props) => {
 
   const { name: user_name } = useRecoilValue(userAtom);
 
-  const { handleAddMsg } = useContext(HandlerContext);
+  const { addMsg } = useContext(HandlerContext);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,7 +31,7 @@ const SendForm = ({ children, ...props }: Props) => {
     const message = target.value;
     if (!message) return;
     const callback = () => {
-      handleAddMsg({
+      addMsg({
         type: 'from',
         date: new Date(),
         msg: message,

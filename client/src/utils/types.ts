@@ -18,4 +18,11 @@ interface Room {
   max_length?: number;
 }
 
-export type { Chat, Info, Room };
+interface Msg {
+  type: string;
+  date: Date;
+  msg: string;
+  user: string;
+}
+
+export type { Chat, Info, Room, Msg };

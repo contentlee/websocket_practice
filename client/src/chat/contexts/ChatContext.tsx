@@ -3,7 +3,7 @@ import { createContext, useCallback, useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 
 import { userAtom } from '@atoms/userAtom';
-import { Chat, Room } from '@utils/types';
+import { Chat, Msg, Room } from '@utils/types';
 
 import { chatSocket } from '@socket';
 
@@ -12,17 +12,12 @@ export const TitleContext = createContext({
   length: 0,
 });
 
-export interface Msg {
-  type: string;
-  date: Date;
-  msg: string;
-  user: string;
-}
 export const MsgContext = createContext<Msg[]>([]);
 
 export const AttendeeContext = createContext<Room['attendee']>([]);
 
 export const HandlerContext = createContext({
+  addMsg: (_: Msg) => {},
   roomInit: (_: Room) => {},
   addPreviousChats: (_: Chat[]) => {},
 });
@@ -34,7 +29,7 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [attendee, setAttendee] = useState<string[]>([]);
 
-  const _handleAddMsg = useCallback((msg: Msg) => setMsgs([...msgs, msg]), [msgs]);
+  const addMsg = useCallback((msg: Msg) => setMsgs([...msgs, msg]), [msgs]);
 
   const addPreviousChats = (chats: Chat[], options = { side: 'previous' }) => {
     const arr = chats.map((c) => {
@@ -59,7 +54,7 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
         return { name: prev.name, length: prev.length + 1 };
       });
       setAttendee([...attendee, user]);
-      _handleAddMsg({
+      addMsg({
         type: 'welcome',
         user,
         msg: `${user} 님이 참여하셨습니다.`,
@@ -78,7 +73,7 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
         tmp.splice(index, 1);
         return tmp;
       });
-      _handleAddMsg({
+      addMsg({
         type: 'bye',
         user,
         msg: `${user} 님이 퇴장하셨습니다.`,
@@ -87,7 +82,7 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
     };
 
     const newMessage = ({ user, date, msg }: Chat) => {
-      _handleAddMsg({ type: 'to', user, date, msg });
+      addMsg({ type: 'to', user, date, msg });
     };
 
     // roomSocket.getRoom(roomName!, myName, getRoom);
@@ -100,13 +95,13 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
       chatSocket.byeRoom(leave).off();
       chatSocket.receiveNewMessage(newMessage).off();
     };
-  }, [_handleAddMsg]);
+  }, [addMsg]);
 
   return (
     <TitleContext.Provider value={title}>
       <MsgContext.Provider value={msgs}>
         <AttendeeContext.Provider value={attendee}>
-          <HandlerContext.Provider value={{ roomInit, addPreviousChats }}>
+          <HandlerContext.Provider value={{ addMsg, roomInit, addPreviousChats }}>
             {children}
           </HandlerContext.Provider>
         </AttendeeContext.Provider>

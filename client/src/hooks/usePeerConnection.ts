@@ -81,7 +81,7 @@ const usePeerConnect = ({ iceServerUrl }: Props) => {
   };
 
   // setting Stream
-  const getMedia = async (constrains: MediaStreamConstraints) => {
+  const _getMedia = async (constrains: MediaStreamConstraints) => {
     return await navigator.mediaDevices
       .getUserMedia(constrains)
       .then((stream) => {
@@ -95,17 +95,17 @@ const usePeerConnect = ({ iceServerUrl }: Props) => {
       });
   };
 
-  const initSender = async (mediaStream: MediaStream) => {
+  const _initSender = async (mediaStream: MediaStream) => {
     mediaStream.getTracks().forEach((track) => {
       peerConnection.current.addTrack(track, mediaStream);
     });
   };
 
-  const getSenders = () => {
+  const _getSenders = () => {
     return peerConnection.current.getSenders();
   };
 
-  const removeSender = () => {
+  const _removeSender = () => {
     const senders = peerConnection.current.getSenders();
     senders.forEach((sender) => {
       peerConnection.current.removeTrack(sender);
@@ -119,14 +119,14 @@ const usePeerConnect = ({ iceServerUrl }: Props) => {
         track.stop();
       });
     }
-    removeSender();
+    _removeSender();
     peerConnection.current.close();
 
     setCallState('waiting');
     setPermit(false);
   };
 
-  const replaceSender = async (mediaStream: MediaStream, senders: RTCRtpSender[]) => {
+  const _replaceSender = async (mediaStream: MediaStream, senders: RTCRtpSender[]) => {
     // 특정 트랙만 교체할시 다른 트랙이 삭제되는 현상으로 인해 sender의 모든 track을 교체한다.
     mediaStream.getTracks().forEach((track) => {
       senders.forEach((sender) => {
@@ -137,19 +137,19 @@ const usePeerConnect = ({ iceServerUrl }: Props) => {
     });
   };
 
-  const initStream = async (mediaStream: MediaStream) => {
-    initSender(mediaStream);
+  const _initStream = async (mediaStream: MediaStream) => {
+    _initSender(mediaStream);
     setMyStream(mediaStream);
 
     return mediaStream;
   };
 
   const updateStream = async ({ constrains, type }: UpdateProps) => {
-    const mediaStream = await getMedia(constrains);
+    const mediaStream = await _getMedia(constrains);
     if (!mediaStream) return null;
-    const senders = getSenders();
-    if (!senders.length) initStream(mediaStream);
-    else replaceSender(mediaStream, senders);
+    const senders = _getSenders();
+    if (!senders.length) _initStream(mediaStream);
+    else _replaceSender(mediaStream, senders);
     setMyStream(mediaStream);
 
     const track = mediaStream.getTracks().filter((t) => t.kind === type)[0];
@@ -206,9 +206,7 @@ const usePeerConnect = ({ iceServerUrl }: Props) => {
 
   // TODO: 기기 추가 및 삭제시 발생하는 이벤트
   const registerChangeDeviceEvent = () => {
-    navigator.mediaDevices.addEventListener('devicechange', (e) => {
-      // console.log(e);
-    });
+    navigator.mediaDevices.addEventListener('devicechange', (e) => {});
   };
 
   const setIcecandidate = async (candidate: RTCIceCandidateInit) => {

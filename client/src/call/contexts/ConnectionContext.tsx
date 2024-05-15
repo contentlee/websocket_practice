@@ -17,6 +17,7 @@ interface PeerConnection {
   updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack | null>;
   toggleStream: (type: 'audio' | 'video') => boolean;
   exitCall: () => void;
+  refresh: () => void;
 }
 
 export const PeerConnectionContext = createContext<PeerConnection>({
@@ -28,6 +29,7 @@ export const PeerConnectionContext = createContext<PeerConnection>({
   updateStream: () => new Promise(() => null),
   toggleStream: () => false,
   exitCall: () => {},
+  refresh: () => {},
 });
 
 interface Devices {
@@ -155,6 +157,10 @@ const ConnectionContext = ({
     registerChangeDeviceEvent();
   };
 
+  const refresh = async () => {
+    await updateStream({ constrains: DEFAULT_CONSTRAINS[type], type });
+  };
+
   useEffect(() => {
     init();
 
@@ -199,6 +205,7 @@ const ConnectionContext = ({
         updateStream,
         toggleStream,
         exitCall,
+        refresh,
       }}
     >
       <DevicesContext.Provider value={devices}>{children}</DevicesContext.Provider>

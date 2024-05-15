@@ -1,11 +1,11 @@
 import { useRecoilState } from 'recoil';
+import { useNavigate } from 'react-router';
 
 import { changeUser, userAtom } from '@atoms/userAtom';
 import { useAlert } from '@hooks';
 
 import { Input, Button } from '@components';
 import { login } from '@http/login';
-import { useNavigate } from 'react-router';
 
 const LoginContainer = () => {
   const navigate = useNavigate();
