@@ -1,9 +1,12 @@
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import { MsgContext } from '../../contexts';
 
 interface Props {
   children: ReactNode;
 }
 const MsgLayout = ({ children }: Props) => {
+  const msgs = useContext(MsgContext);
+
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scrollHeight, setScrollHeight] = useState(0);
 
@@ -12,12 +15,12 @@ const MsgLayout = ({ children }: Props) => {
       if (scrollHeight === 0) {
         wrapRef.current.scrollTo({ top: wrapRef.current.scrollHeight });
       } else {
-        const height = wrapRef.current.scrollHeight - scrollHeight;
-        wrapRef.current.scrollTo({ top: height });
+        const top = wrapRef.current.scrollHeight - scrollHeight;
+        wrapRef.current.scrollTo({ top: top });
       }
-      setScrollHeight(wrapRef.current.scrollHeight);
+      setScrollHeight(wrapRef.current?.scrollHeight);
     }
-  }, [wrapRef.current, children]);
+  }, [wrapRef.current, msgs]);
 
   return (
     <div
