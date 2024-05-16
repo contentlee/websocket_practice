@@ -4,8 +4,6 @@ class SocketProvider {
   private socket = io('ws://192.168.0.122:8080');
 
   get() {
-    console.log(this.socket);
-
     return this.socket;
   }
 

@@ -15,6 +15,7 @@ class CallRoute extends BaseRoute {
     this.socket.on("require_video_call", this.controller.requireVideoCall);
     this.socket.on("permit_call", this.controller.permitCall);
     this.socket.on("cancel_call", this.controller.cancelCall);
+    this.socket.on("reject_call", this.controller.rejectCall);
     this.socket.on("end_call", this.controller.endCall);
   };
 }

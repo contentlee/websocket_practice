@@ -3,7 +3,7 @@ import Alarm from './Alarm';
 export default Alarm;
 
 import AlarmLayout from './AlarmLayout';
-import CancelButton from './CancelButton';
+import RejectButton from './RejectButton';
 import PermitButton from './PermitButton';
 
-export { AlarmLayout, CancelButton, PermitButton };
+export { AlarmLayout, RejectButton, PermitButton };

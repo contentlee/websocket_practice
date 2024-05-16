@@ -10,8 +10,8 @@ const chatSocket = {
     socket.send('new_message', message, room_name, user_name, callback),
   leavRoom: (room_name: string, user_name: string, callback: () => void) =>
     socket.send('leave_room', room_name, user_name, callback),
-  requireCall: (your_name: string, room_name: string, callback: () => void) =>
-    socket.send('require_call', your_name, room_name, callback),
+  requireCall: (your_name: string, callback: () => void) =>
+    socket.send('require_call', your_name, callback),
   requireVideoCall: (your_name: string, room_name: string, callback: () => void) =>
     socket.send('require_video_call', your_name, room_name, callback),
 };

@@ -13,11 +13,12 @@ interface PeerConnection {
   myStream: MediaStream | null;
   peerStream: MediaStream | null;
   callState: 'connect' | 'waiting';
+  permit: boolean;
   devicePermissionState: boolean;
   updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack | null>;
   toggleStream: (type: 'audio' | 'video') => boolean;
   exitCall: () => void;
-  refresh: () => void;
+  refresh: () => Promise<MediaStreamTrack | void>;
 }
 
 export const PeerConnectionContext = createContext<PeerConnection>({
@@ -25,11 +26,12 @@ export const PeerConnectionContext = createContext<PeerConnection>({
   myStream: null,
   peerStream: null,
   callState: 'waiting',
+  permit: false,
   devicePermissionState: false,
   updateStream: () => new Promise(() => null),
   toggleStream: () => false,
   exitCall: () => {},
-  refresh: () => {},
+  refresh: () => new Promise(() => null),
 });
 
 interface Devices {
@@ -88,7 +90,7 @@ const ConnectionContext = ({
   const devices = useGetDevices(type);
 
   const initPermit = () => {
-    if (roomName === userName) return;
+    if (roomName !== userName) return;
     if (!permit && peerConnection) {
       callSocket.sendPermit(roomName!, () => {
         changePermit(true);
@@ -123,7 +125,7 @@ const ConnectionContext = ({
     if (candidate) callSocket.sendIcecandidate(roomName!, candidate, () => {});
   };
 
-  const cancelCall = () => {
+  const rejectCall = () => {
     addAlert('warning', '상대방이 통화를 거부하였습니다.');
     resetTrack();
     navigate(-1);
@@ -173,7 +175,7 @@ const ConnectionContext = ({
     // when peer send candidate
     callSocket.icecandidate(icecandidate).on();
     // when peer reject your call
-    callSocket.cancelCall(cancelCall).on();
+    callSocket.rejectCall(rejectCall).on();
     // when peer end call
     callSocket.endCall(endCall).on();
 
@@ -182,7 +184,7 @@ const ConnectionContext = ({
       callSocket.offer(offer).off();
       callSocket.answer(answer).off();
       callSocket.icecandidate(icecandidate).off();
-      callSocket.cancelCall(cancelCall).off();
+      callSocket.rejectCall(rejectCall).off();
       callSocket.endCall(endCall).off();
     };
   }, [socket]);
@@ -201,6 +203,7 @@ const ConnectionContext = ({
         myStream,
         peerStream,
         callState,
+        permit,
         devicePermissionState,
         updateStream,
         toggleStream,

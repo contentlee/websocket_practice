@@ -7,11 +7,11 @@ class CallContoller extends BaseController {
     super(server, socket);
   }
 
-  public requireCall = (toUserName: string, fromUserName: string, done: () => void) => {
+  public requireCall = (toUserName: string, done: () => void) => {
     const userInfo = clients.findUserIdByName(toUserName);
     if (userInfo) {
-      this.socket.join(fromUserName);
-      this.socket.to(userInfo.id).emit("require_call", fromUserName);
+      this.socket.join(toUserName);
+      this.socket.to(userInfo.id).emit("require_call", toUserName);
       done();
     } else {
       this.socket.emit("not_found_user");
@@ -35,8 +35,16 @@ class CallContoller extends BaseController {
     done();
   };
 
-  public cancelCall = (fromUserName: string, done: () => void) => {
-    this.socket.to(fromUserName).emit("cancel_call");
+  public cancelCall = (toUserName: string, done: () => void) => {
+    const userInfo = clients.findUserIdByName(toUserName);
+    if (userInfo) {
+      this.socket.to(userInfo.id).emit("cancel_call");
+    }
+    done();
+  };
+
+  public rejectCall = (roomName: string, done: () => void) => {
+    this.socket.to(roomName).emit("cancel_call");
     done();
   };
 

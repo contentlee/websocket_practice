@@ -1,3 +1,5 @@
+import { Spinner } from '@components';
+import { palette } from '@utils/palette';
 import { useEffect } from 'react';
 
 interface Props {
@@ -20,9 +22,16 @@ const LoadingVideo = ({ callState }: Props) => {
     <div
       css={{
         flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: '14px',
+        gap: '24px',
       }}
     >
-      연결중입니다!
+      <Spinner />
+      <div>연결중입니다!</div>
     </div>
   );
 };

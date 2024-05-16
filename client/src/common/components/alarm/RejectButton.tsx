@@ -12,7 +12,7 @@ interface Props {
   cancelCall: () => void;
 }
 
-const CancelButton = ({ type, cancelCall }: Props) => {
+const RejectButton = ({ type, cancelCall }: Props) => {
   const handleClickCancel = (e: MouseEvent) => {
     e.preventDefault();
     cancelCall();
@@ -35,4 +35,4 @@ const CancelButton = ({ type, cancelCall }: Props) => {
   );
 };
 
-export default CancelButton;
+export default RejectButton;

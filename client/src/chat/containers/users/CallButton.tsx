@@ -5,8 +5,6 @@ import { chatSocket } from '@socket';
 
 import CallIcon from '@assets/call_icon.svg';
 
-import { userAtom } from '@atoms/userAtom';
-
 import { Icon } from '@components';
 
 interface Props {
@@ -16,15 +14,12 @@ interface Props {
 const CallButton = ({ user }: Props) => {
   const navigate = useNavigate();
 
-  const { name: room_name } = useRecoilValue(userAtom);
-
   const handleClickCall = (e: React.MouseEvent) => {
     e.preventDefault();
-
     const callback = () => {
-      navigate(`/call/${room_name}`);
+      navigate(`/call/${user}`);
     };
-    chatSocket.requireCall(user, room_name, callback);
+    chatSocket.requireCall(user, callback);
   };
 
   return <Icon src={CallIcon} size="small" onClick={handleClickCall}></Icon>;

@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
 import { Socket } from 'socket.io-client';
 
-import { AlarmLayout, CancelButton, PermitButton } from '.';
+import { AlarmLayout, RejectButton, PermitButton } from '.';
 
 interface Props {
   socket: Socket;
@@ -25,7 +25,7 @@ const Alarm = ({ socket }: Props) => {
   const requireCancelCall = () => {
     if (!isOpened) return;
     const closeAlarm = () => setOpened(false);
-    socket.emit('cancel_call', name, closeAlarm);
+    socket.emit('reject_call', name, closeAlarm);
   };
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const Alarm = ({ socket }: Props) => {
     createPortal(
       <AlarmLayout>
         <PermitButton type={type} permitCall={requirePermitCall} />
-        <CancelButton type={type} cancelCall={requireCancelCall} />
+        <RejectButton type={type} cancelCall={requireCancelCall} />
       </AlarmLayout>,
       document.body,
       'alarm',
