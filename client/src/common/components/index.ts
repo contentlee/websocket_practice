@@ -12,6 +12,7 @@ import Select from './Select';
 import Spinner from './Spinner';
 import TextArea from './TextArea';
 import Title from './Title';
+import Toggle from './Toggle';
 
 export {
   Alarm,
@@ -28,4 +29,5 @@ export {
   Spinner,
   TextArea,
   Title,
+  Toggle,
 };

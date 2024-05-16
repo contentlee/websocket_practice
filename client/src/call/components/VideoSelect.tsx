@@ -8,10 +8,11 @@ interface Props {
   stream: MediaStream | null;
   list?: MediaDeviceInfo[];
   type: 'audio' | 'video';
+  label?: string;
   updateStream: ({ constrains, type }: UpdateProps) => Promise<MediaStreamTrack | null>;
 }
 
-const VideoSelect = ({ stream, list = [], type, updateStream }: Props) => {
+const VideoSelect = ({ stream, list = [], type, label, updateStream }: Props) => {
   const [selected, setSelected] = useState<MediaStreamTrack>();
 
   const handleChangeVideo = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -49,12 +50,26 @@ const VideoSelect = ({ stream, list = [], type, updateStream }: Props) => {
   }, [stream]);
 
   return (
-    <Select
-      css={{ border: 'none' }}
-      defaultValue={selected?.id}
-      option={list}
-      onChange={handleChangeVideo}
-    />
+    <div
+      css={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+      }}
+    >
+      {label && (
+        <label
+          css={{
+            fontSize: '14px',
+            fontWeight: 600,
+            padding: '0 10px',
+          }}
+        >
+          {label}
+        </label>
+      )}
+      <Select defaultValue={selected?.id} option={list} onChange={handleChangeVideo} />
+    </div>
   );
 };
 

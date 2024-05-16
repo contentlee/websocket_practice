@@ -3,7 +3,7 @@
 ## Description
 
 - Socket.io와 WebRTC로 만들어진 채팅앱입니다. 채팅, 1:1 음성 통화 및 영상 통화를 지원하고 있습니다.
-- 싱글톤 패턴을 사용하여 socket Provider를 만들었고, Provider를 통해 socket 요청을 정형화하였습니다.
+- http 요청과 socket 요청을 경우에 따라 적절하게 사용하였습니다.
 - WebRTC 연결을 위한 hook을 만들어 제공하고 있습니다. 외부 의존성을 줄이기 위해 상태와 메서드만을 반환하도록 했고, 실제 실행의 경우는 context에서 이루어지도록 하였습니다.
 
 [ABOUT WEBRTC](https://industrious-backbone-3d5.notion.site/WEBRTC-1893b59ff8ef489e9082247ccb92b82e?pvs=4)

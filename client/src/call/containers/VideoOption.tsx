@@ -1,19 +1,29 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useParams } from 'react-router';
 import { useRecoilValue } from 'recoil';
 
-import { DevicesContext, PeerConnectionContext } from '../contexts';
-import { AudioToggleButton, ExitButton, VideoSelect, VideoToggleButton } from '../components';
+import { PeerConnectionContext } from '../contexts';
+import { AudioToggleButton, ExitButton, OptionButton, VideoToggleButton } from '../components';
+import { VideoSettingModal } from '.';
+
 import { userAtom } from '@atoms/userAtom';
+import { Modal } from '@components';
 
 const VideoOption = () => {
   const { name: roomName } = useParams();
   const { name: userName } = useRecoilValue(userAtom);
 
-  const { peerConnection, myStream, updateStream, toggleStream, exitCall } =
-    useContext(PeerConnectionContext);
-  const { audioList, videoList } = useContext(DevicesContext);
+  const { myStream, permit, toggleStream, exitCall } = useContext(PeerConnectionContext);
 
+  const [isOpened, setOpened] = useState(false);
+
+  const openModal = () => {
+    setOpened(true);
+  };
+
+  const closeModal = () => {
+    setOpened(false);
+  };
   return (
     <div
       css={{
@@ -30,30 +40,21 @@ const VideoOption = () => {
         boxSizing: 'border-box',
       }}
     >
-      <VideoSelect
-        peerConnection={peerConnection}
-        stream={myStream}
-        list={audioList}
-        type="audio"
-        updateStream={updateStream}
-      />
-      <VideoSelect
-        peerConnection={peerConnection}
-        stream={myStream}
-        list={videoList}
-        type="video"
-        updateStream={updateStream}
-      />
       <div css={{ display: 'flex', width: '100%' }}>
-        <VideoToggleButton css={{ flex: 1 / 3 }} stream={myStream} toggleStream={toggleStream} />
-        <AudioToggleButton css={{ flex: 1 / 3 }} stream={myStream} toggleStream={toggleStream} />
+        <VideoToggleButton css={{ flex: 1 / 4 }} stream={myStream} toggleStream={toggleStream} />
+        <AudioToggleButton css={{ flex: 1 / 4 }} stream={myStream} toggleStream={toggleStream} />
+        <OptionButton css={{ flex: 1 / 4 }} openModal={openModal} />
         <ExitButton
-          css={{ flex: 1 / 3 }}
+          css={{ flex: 1 / 4 }}
           roomName={roomName!}
           userName={userName}
+          permit={permit}
           exitCall={exitCall}
         />
       </div>
+      <Modal isOpened={isOpened} closeModal={closeModal}>
+        <VideoSettingModal />
+      </Modal>
     </div>
   );
 };

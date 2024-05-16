@@ -1,19 +1,30 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useParams } from 'react-router';
 import { useRecoilValue } from 'recoil';
 
-import { AudioSelect, AudioToggleButton, ExitButton } from '../components';
-import { DevicesContext, PeerConnectionContext } from '../contexts';
-
 import { userAtom } from '@atoms/userAtom';
 import { palette } from '@utils/palette';
+import { Modal } from '@components';
+
+import { AudioToggleButton, ExitButton, OptionButton } from '../components';
+import { CallSettingModal } from '.';
+import { PeerConnectionContext } from '../contexts';
 
 const CallOption = () => {
   const { name: roomName } = useParams();
   const { name: userName } = useRecoilValue(userAtom);
 
-  const { myStream, updateStream, toggleStream, exitCall } = useContext(PeerConnectionContext);
-  const { audioList } = useContext(DevicesContext);
+  const { myStream, permit, toggleStream, exitCall } = useContext(PeerConnectionContext);
+
+  const [isOpened, setOpened] = useState(false);
+
+  const openModal = () => {
+    setOpened(true);
+  };
+
+  const closeModal = () => {
+    setOpened(false);
+  };
   return (
     <div
       css={{
@@ -31,15 +42,19 @@ const CallOption = () => {
         border: '1.5px solid' + palette.main.blk,
       }}
     >
-      <AudioSelect audioList={audioList} stream={myStream} updateStream={updateStream} />
-      <div css={{ display: 'flex', width: '100%', borderTop: '1.5px solid' + palette.main.blk }}>
-        <AudioToggleButton css={{ flex: 1 / 2 }} stream={myStream} toggleStream={toggleStream} />
+      <div css={{ display: 'flex', width: '100%' }}>
+        <AudioToggleButton css={{ flex: 1 / 3 }} stream={myStream} toggleStream={toggleStream} />
+        <OptionButton css={{ flex: 1 / 3 }} openModal={openModal} />
         <ExitButton
-          css={{ flex: 1 / 2 }}
+          css={{ flex: 1 / 3 }}
           roomName={roomName!}
           userName={userName}
+          permit={permit}
           exitCall={exitCall}
         />
+        <Modal isOpened={isOpened} closeModal={closeModal}>
+          <CallSettingModal />
+        </Modal>
       </div>
     </div>
   );
