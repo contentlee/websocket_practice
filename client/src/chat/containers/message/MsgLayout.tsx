@@ -5,22 +5,27 @@ interface Props {
   children: ReactNode;
 }
 const MsgLayout = ({ children }: Props) => {
-  const msgs = useContext(MsgContext);
+  const { msgs, type } = useContext(MsgContext);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scrollHeight, setScrollHeight] = useState(0);
 
   useEffect(() => {
     if (!!wrapRef.current) {
-      if (scrollHeight === 0) {
-        wrapRef.current.scrollTo({ top: wrapRef.current.scrollHeight });
-      } else {
-        const top = wrapRef.current.scrollHeight - scrollHeight;
+      const currentHeight = wrapRef.current.scrollHeight;
+      if (type === 'init' && scrollHeight === 0) {
+        wrapRef.current.scrollTo({ top: currentHeight });
+      }
+      if (type === 'previous') {
+        const top = currentHeight - scrollHeight;
         wrapRef.current.scrollTo({ top: top });
       }
-      setScrollHeight(wrapRef.current?.scrollHeight);
+      if (type === 'send') {
+        wrapRef.current.scrollTo({ top: currentHeight });
+      }
+      setScrollHeight(currentHeight);
     }
-  }, [wrapRef.current, msgs]);
+  }, [msgs]);
 
   return (
     <div

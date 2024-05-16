@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { EnterMsg, FromMsg, MsgLayout, MoreAndMore, ToMsg } from '.';
@@ -12,7 +12,7 @@ import Io from '@utils/io';
 const Messages = () => {
   const { name: roomName } = useParams();
 
-  const msgs = useContext(MsgContext);
+  const { msgs } = useContext(MsgContext);
   const { roomInit, addPreviousChats } = useContext(HandlerContext);
 
   const [isLast, setLast] = useState(false);
@@ -27,7 +27,9 @@ const Messages = () => {
       return;
     }
 
-    if (chats) addPreviousChats(chats);
+    if (chats) {
+      addPreviousChats(chats);
+    }
     io.enqueueFn(requirePreviousChats(+start_idx));
   };
 

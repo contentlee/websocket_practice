@@ -7,12 +7,20 @@ import { Chat, Msg, Room } from '@utils/types';
 
 import { chatSocket } from '@socket';
 
+interface Msgs {
+  msgs: Msg[];
+  type: 'init' | 'new' | 'send' | 'previous';
+}
+
 export const TitleContext = createContext({
   name: '익명',
   length: 0,
 });
 
-export const MsgContext = createContext<Msg[]>([]);
+export const MsgContext = createContext<Msgs>({
+  msgs: [],
+  type: 'init',
+});
 
 export const AttendeeContext = createContext<Room['attendee']>([]);
 
@@ -28,18 +36,22 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
   const [title, setTitle] = useState({ name: '익명', length: 0 });
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [attendee, setAttendee] = useState<string[]>([]);
+  const [msgType, setMsgType] = useState<'init' | 'new' | 'previous' | 'send'>('init');
 
-  const addMsg = useCallback((msg: Msg) => setMsgs([...msgs, msg]), [msgs]);
+  const addMsg = (msg: Msg) => {
+    setMsgs([...msgs, msg]);
+    setMsgType('send');
+  };
 
-  const addPreviousChats = (chats: Chat[], options = { side: 'previous' }) => {
+  const addPreviousChats = (chats: Chat[]) => {
     const arr = chats.map((c) => {
       if (c.type === 'message') {
         c.type = c.user === myName ? 'from' : 'to';
       }
       return c;
     });
-    if (options.side === 'previous') setMsgs((m) => [...arr, ...m]);
-    else setMsgs((m) => [...m, ...arr]);
+    setMsgs((m) => [...arr, ...m]);
+    setMsgType('previous');
   };
 
   const roomInit = (room: Room) => {
@@ -60,6 +72,7 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
         msg: `${user} 님이 참여하셨습니다.`,
         date: new Date(),
       });
+      setMsgType('new');
     };
 
     const leave = (user: string) => {
@@ -79,10 +92,12 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
         msg: `${user} 님이 퇴장하셨습니다.`,
         date: new Date(),
       });
+      setMsgType('new');
     };
 
     const newMessage = ({ user, date, msg }: Chat) => {
       addMsg({ type: 'to', user, date, msg });
+      setMsgType('new');
     };
 
     // roomSocket.getRoom(roomName!, myName, getRoom);
@@ -99,7 +114,7 @@ const ChatContext = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <TitleContext.Provider value={title}>
-      <MsgContext.Provider value={msgs}>
+      <MsgContext.Provider value={{ msgs, type: msgType }}>
         <AttendeeContext.Provider value={attendee}>
           <HandlerContext.Provider value={{ addMsg, roomInit, addPreviousChats }}>
             {children}
