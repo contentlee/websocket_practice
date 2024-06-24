@@ -14,9 +14,6 @@ interface Props extends HTMLAttributes<HTMLFormElement> {
   children: ReactNode;
 }
 
-// TODO : 입력창 세로중앙정렬
-// TODO : 메세지 보낸 후 TextArea 크기 원상태 복구
-// TODO :
 const SendForm = ({ children, ...props }: Props) => {
   // roomName
   const { name: room_name } = useParams();
