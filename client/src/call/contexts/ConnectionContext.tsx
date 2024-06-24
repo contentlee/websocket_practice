@@ -90,7 +90,7 @@ const ConnectionContext = ({
   const devices = useGetDevices(type);
 
   const initPermit = () => {
-    if (roomName !== userName) return;
+    if (roomName === userName) return;
     if (!permit && peerConnection) {
       callSocket.sendPermit(roomName!, () => {
         changePermit(true);
